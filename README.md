@@ -1,2 +1,3 @@
 # constellar
-constellar.club
+
+Constellar — coordinated intelligence for programmable judgment.
