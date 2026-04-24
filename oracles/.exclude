@@ -1,0 +1,12 @@
+*.log
+.exclude
+__pycache__
+*.db
+*.pid
+*.log.*
+logs
+node_modules
+data
+.deploy
+venv
+dist

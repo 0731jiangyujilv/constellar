@@ -1,0 +1,37 @@
+{
+  "name": "betsys-oracles",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:twitter": "tsx watch src/nodes/twitter/index.ts",
+    "dev:google": "tsx watch src/nodes/google/index.ts",
+    "dev:news": "tsx watch src/nodes/news/index.ts",
+    "dev:reddit": "tsx watch src/nodes/reddit/index.ts",
+    "dev:youtube": "tsx watch src/nodes/youtube/index.ts",
+    "build": "tsc",
+    "swarm:start": "pm2 start ecosystem.config.cjs",
+    "swarm:stop": "pm2 stop ecosystem.config.cjs",
+    "swarm:restart": "pm2 restart ecosystem.config.cjs",
+    "swarm:delete": "pm2 delete ecosystem.config.cjs",
+    "swarm:status": "pm2 ls",
+    "swarm:logs": "pm2 logs",
+    "swarm:kill-youtube": "pm2 stop oracle-youtube-05",
+    "swarm:revive-youtube": "pm2 restart oracle-youtube-05"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "viem": "^2.34.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.15.0",
+    "pm2": "^5.4.3",
+    "tsx": "^4.19.4",
+    "typescript": "^5.9.0"
+  }
+}
