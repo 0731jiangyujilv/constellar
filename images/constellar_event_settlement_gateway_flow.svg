@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1040" viewBox="0 0 1800 1040" role="img" aria-label="Constellar event settlement flow with Oracle Swarm and Gateway nanopayments">
+<defs>
+  <linearGradient id="pageBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8fbff"/><stop offset=".55" stop-color="#eef6ff"/><stop offset="1" stop-color="#fff8ed"/></linearGradient>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#64748b" flood-opacity="0.18"/></filter>
+  <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker>
+  <style>
+    text{font-family:Inter,Arial,Helvetica,sans-serif; fill:#0f172a;}
+    .title{font-size:34px;font-weight:900;letter-spacing:-.3px;}
+    .subtitle{font-size:16px;fill:#475569;}
+    .group{fill:rgba(255,255,255,.74);stroke:#cbd5e1;stroke-width:2;rx:26;ry:26;filter:url(#shadow)}
+    .group-title{font-size:20px;font-weight:850;}
+    .group-sub{font-size:13px;fill:#64748b;}
+    .box{fill:white;stroke:#94a3b8;stroke-width:2;rx:18;ry:18;filter:url(#shadow)}
+    .box-blue{fill:#eff6ff;stroke:#3b82f6}.box-purple{fill:#f5f3ff;stroke:#8b5cf6}.box-green{fill:#ecfdf5;stroke:#10b981}.box-amber{fill:#fffbeb;stroke:#f59e0b}.box-rose{fill:#fff1f2;stroke:#f43f5e}.box-cyan{fill:#ecfeff;stroke:#06b6d4}.box-slate{fill:#f8fafc;stroke:#64748b}.box-indigo{fill:#eef2ff;stroke:#6366f1}
+    .label{font-size:16px;font-weight:800}.small{font-size:13.4px;fill:#334155}.tiny{font-size:12px;fill:#64748b}.chipText{font-size:12px;font-weight:800;fill:#fff}
+    .arrow{stroke:#334155;stroke-width:2.6;fill:none;marker-end:url(#arrowhead)}.arrow-blue{stroke:#2563eb}.arrow-green{stroke:#059669}.arrow-purple{stroke:#7c3aed}.arrow-amber{stroke:#d97706}.arrow-rose{stroke:#e11d48}.dashed{stroke-dasharray:9 7}.thin{stroke-width:1.9}
+    .note{font-size:12.5px;fill:#475569;font-weight:700}.badge{rx:999;ry:999;filter:url(#shadow)}
+  </style>
+</defs>
+<rect width="100%" height="100%" fill="url(#pageBg)"/>
+<circle cx="1650" cy="110" r="135" fill="#e0e7ff" opacity=".65"/><circle cx="140" cy="920" r="160" fill="#dcfce7" opacity=".45"/>
+<text x="70" y="64" class="title">Constellar · Event Settlement Flow with Gateway Nanopayments</text>
+<text x="70" y="94" class="subtitle">event-settlement cron resolves an EventBet via 5-oracle swarm consensus, records SSE consensus, and updates Arc reputation while payments are batched through Circle Gateway.</text>
+
+<g>
+  <rect x="55" y="135" width="300" height="760" class="group "/>
+  <text x="79" y="169" class="group-title">1 · Trigger + Contract Read</text>
+  <text x="79" y="191" class="group-sub">Scheduled worker pulls unresolved events</text>
+</g>
+<g>
+  <rect x="90" y="210" width="230" height="92" class="box box-green"/>
+  <text x="112" y="242" class="label">event-settlement cron</text>
+  
+  <text x="112" y="270" class="small" text-anchor="start">PM2 worker</text>
+<text x="112" y="289" class="small" text-anchor="start">leases unresolved EventBet</text>
+
+</g>
+<g>
+  <rect x="90" y="350" width="230" height="92" class="box box-blue"/>
+  <text x="112" y="382" class="label">EventBet.question()</text>
+  
+  <text x="112" y="410" class="small" text-anchor="start">read question + topic</text>
+<text x="112" y="429" class="small" text-anchor="start">via viem on Arc</text>
+
+</g>
+<g>
+  <rect x="90" y="490" width="230" height="92" class="box box-purple"/>
+  <text x="112" y="522" class="label">resolveWithSwarm(q, topic)</text>
+  
+  <text x="112" y="550" class="small" text-anchor="start">call oracle-aggregator</text>
+<text x="112" y="569" class="small" text-anchor="start">prepare paid queries</text>
+
+</g>
+<g>
+  <rect x="400" y="135" width="390" height="760" class="group "/>
+  <text x="424" y="169" class="group-title">2 · x402 Payment Negotiation</text>
+  <text x="424" y="191" class="group-sub">HTTP layer: how each oracle call is paid</text>
+</g>
+<g>
+  <rect x="435" y="205" width="320" height="100" class="box box-amber"/>
+  <text x="457" y="237" class="label">GatewayClient.pay(url)</text>
+  
+  <text x="457" y="265" class="small" text-anchor="start">bot uses Gateway Wallet balance</text>
+<text x="457" y="284" class="small" text-anchor="start">receives 402 Payment Required</text>
+<text x="457" y="303" class="small" text-anchor="start">creates EIP-3009 authorization</text>
+
+</g>
+<g>
+  <rect x="435" y="340" width="320" height="105" class="box box-amber"/>
+  <text x="457" y="372" class="label">X-PAYMENT Header</text>
+  
+  <text x="457" y="400" class="small" text-anchor="start">TransferWithAuthorization signature</text>
+<text x="457" y="419" class="small" text-anchor="start">sent as HTTP header</text>
+<text x="457" y="438" class="small" text-anchor="start">no immediate chain tx</text>
+
+</g>
+<g>
+  <rect x="435" y="490" width="320" height="130" class="box box-amber"/>
+  <text x="457" y="522" class="label">Tiered Nanopayments</text>
+  
+  <text x="457" y="550" class="small" text-anchor="start">/evidence   1000µ</text>
+<text x="457" y="569" class="small" text-anchor="start">/summarize  3000µ</text>
+<text x="457" y="588" class="small" text-anchor="start">/verdict    5000µ</text>
+<text x="457" y="607" class="small" text-anchor="start">per-oracle, per-stage accounting</text>
+
+</g>
+<g>
+  <rect x="835" y="135" width="430" height="760" class="group "/>
+  <text x="859" y="169" class="group-title">3 · Oracle Swarm Consensus</text>
+  <text x="859" y="191" class="group-sub">5 parallel oracles produce evidence, summaries, verdicts</text>
+</g>
+<g>
+  <rect x="875" y="200" width="350" height="90" class="box box-purple"/>
+  <text x="897" y="232" class="label">parallel query × 5</text>
+  
+  <text x="897" y="260" class="small" text-anchor="start">twitter / google / news</text>
+<text x="897" y="279" class="small" text-anchor="start">reddit / youtube</text>
+
+</g>
+<g>
+  <rect x="875" y="330" width="350" height="88" class="box box-cyan"/>
+  <text x="897" y="362" class="label">evidence × N</text>
+  
+  <text x="897" y="390" class="small" text-anchor="start">source fetch + quote extraction</text>
+<text x="897" y="409" class="small" text-anchor="start">paid by 1000µ tier</text>
+
+</g>
+<g>
+  <rect x="875" y="458" width="350" height="88" class="box box-cyan"/>
+  <text x="897" y="490" class="label">summarize</text>
+  
+  <text x="897" y="518" class="small" text-anchor="start">Gemini reasoning summary</text>
+<text x="897" y="537" class="small" text-anchor="start">paid by 3000µ tier</text>
+
+</g>
+<g>
+  <rect x="875" y="586" width="350" height="88" class="box box-cyan"/>
+  <text x="897" y="618" class="label">verdict</text>
+  
+  <text x="897" y="646" class="small" text-anchor="start">outcome + confidence + rationale</text>
+<text x="897" y="665" class="small" text-anchor="start">paid by 5000µ tier</text>
+
+</g>
+<g>
+  <rect x="875" y="720" width="350" height="96" class="box box-green"/>
+  <text x="897" y="752" class="label">confidence-weighted vote</text>
+  
+  <text x="897" y="780" class="small" text-anchor="start">outcome / spread / perOracle</text>
+<text x="897" y="799" class="small" text-anchor="start">consensus object returned</text>
+
+</g>
+<g>
+  <rect x="1310" y="135" width="430" height="365" class="group "/>
+  <text x="1334" y="169" class="group-title">4 · Circle Gateway Settlement</text>
+  <text x="1334" y="191" class="group-sub">Chain layer: batching, netting, and final USDC settlement</text>
+</g>
+<g>
+  <rect x="1345" y="200" width="350" height="88" class="box box-indigo"/>
+  <text x="1367" y="232" class="label">createGatewayMiddleware</text>
+  
+  <text x="1367" y="260" class="small" text-anchor="start">oracle receives X-PAYMENT</text>
+<text x="1367" y="279" class="small" text-anchor="start">submits signature to facilitator</text>
+
+</g>
+<g>
+  <rect x="1345" y="325" width="350" height="105" class="box box-indigo"/>
+  <text x="1367" y="357" class="label">Gateway Facilitator in TEE</text>
+  
+  <text x="1367" y="385" class="small" text-anchor="start">AWS Nitro TEE verification</text>
+<text x="1367" y="404" class="small" text-anchor="start">ledger accounting + netting</text>
+<text x="1367" y="423" class="small" text-anchor="start">batch settlement later</text>
+
+</g>
+<g>
+  <rect x="1310" y="530" width="430" height="365" class="group "/>
+  <text x="1334" y="564" class="group-title">5 · Arc State + UI Feedback</text>
+  <text x="1334" y="586" class="group-sub">On-chain settlement, live frontend, and reputation loop</text>
+</g>
+<g>
+  <rect x="1345" y="590" width="350" height="84" class="box box-green"/>
+  <text x="1367" y="622" class="label">EventBet.resolve(...)</text>
+  
+  <text x="1367" y="650" class="small" text-anchor="start">outcome + reasoning</text>
+<text x="1367" y="669" class="small" text-anchor="start">tx on Arc</text>
+
+</g>
+<g>
+  <rect x="1345" y="702" width="350" height="84" class="box box-blue"/>
+  <text x="1367" y="734" class="label">SSE consensus event</text>
+  
+  <text x="1367" y="762" class="small" text-anchor="start">recordConsensus({...})</text>
+<text x="1367" y="781" class="small" text-anchor="start">OracleSwarmPage → ConsensusCard</text>
+
+</g>
+<g>
+  <rect x="1345" y="814" width="350" height="84" class="box box-rose"/>
+  <text x="1367" y="846" class="label">OracleRegistry.applyOutcome</text>
+  
+  <text x="1367" y="874" class="small" text-anchor="start">tokenIds + deltas</text>
+<text x="1367" y="893" class="small" text-anchor="start">reputation tx on Arc</text>
+
+</g><path d="M205,302 L205,350" class="arrow arrow-blue"/>
+<path d="M205,442 L205,490" class="arrow arrow-purple"/>
+<path d="M320,536 C377.5,536 377.5,255 435,255" class="arrow arrow-amber"/>
+<path d="M595,305 L595,340" class="arrow arrow-amber"/>
+<path d="M595,445 L595,490" class="arrow arrow-amber"/>
+<path d="M755,555 C815.0,555 815.0,245 875,245" class="arrow arrow-purple"/>
+<path d="M1050,290 L1050,330" class="arrow arrow-purple"/>
+<path d="M1050,418 L1050,458" class="arrow arrow-purple"/>
+<path d="M1050,546 L1050,586" class="arrow arrow-purple"/>
+<path d="M1050,674 L1050,720" class="arrow arrow-green"/>
+<path d="M1225,250 C1285.0,250 1285.0,245 1345,245" class="arrow arrow-purple dashed"/>
+<path d="M1520,288 L1520,325" class="arrow arrow-purple"/>
+<path d="M1225,768 C1285.0,768 1285.0,630 1345,630" class="arrow arrow-green"/>
+<path d="M1520,674 L1520,702" class="arrow arrow-blue"/>
+<path d="M1520,786 L1520,814" class="arrow arrow-rose"/>
+<path d="M1345,744 C832.5,744 832.5,690 320,690" class="arrow arrow-blue dashed thin"/>
+<rect x="458" y="155" width="275" height="28" class="badge" fill="#d97706"/><text x="595" y="174" class="chipText" text-anchor="middle">x402 = payment negotiation standard</text>
+<rect x="1360" y="155" width="320" height="28" class="badge" fill="#6366f1"/><text x="1520" y="174" class="chipText" text-anchor="middle">Gateway = TEE verification + batch settlement</text>
+<text x="70" y="975" class="note">Key change: Constellar keeps x402 at the HTTP layer, but moves chain settlement to Circle Gateway. Oracles no longer submit transferWithAuthorization transactions themselves; Gateway aggregates signatures, performs TEE accounting/netting, and settles in batches.</text>
+</svg>

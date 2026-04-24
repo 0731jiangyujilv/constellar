@@ -1,0 +1,249 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1320" viewBox="0 0 1800 1320" role="img" aria-label="Constellar Oracle Swarm architecture with x402 and Circle Gateway nanopayments">
+<defs>
+  <linearGradient id="pageBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8fbff"/><stop offset=".55" stop-color="#eef6ff"/><stop offset="1" stop-color="#fff8ed"/></linearGradient>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#64748b" flood-opacity="0.18"/></filter>
+  <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#334155"/></marker>
+  <style>
+    text{font-family:Inter,Arial,Helvetica,sans-serif; fill:#0f172a;}
+    .title{font-size:34px;font-weight:900;letter-spacing:-.3px;}
+    .subtitle{font-size:16px;fill:#475569;}
+    .group{fill:rgba(255,255,255,.74);stroke:#cbd5e1;stroke-width:2;rx:26;ry:26;filter:url(#shadow)}
+    .group-title{font-size:20px;font-weight:850;}
+    .group-sub{font-size:13px;fill:#64748b;}
+    .box{fill:white;stroke:#94a3b8;stroke-width:2;rx:18;ry:18;filter:url(#shadow)}
+    .box-blue{fill:#eff6ff;stroke:#3b82f6}.box-purple{fill:#f5f3ff;stroke:#8b5cf6}.box-green{fill:#ecfdf5;stroke:#10b981}.box-amber{fill:#fffbeb;stroke:#f59e0b}.box-rose{fill:#fff1f2;stroke:#f43f5e}.box-cyan{fill:#ecfeff;stroke:#06b6d4}.box-slate{fill:#f8fafc;stroke:#64748b}.box-indigo{fill:#eef2ff;stroke:#6366f1}
+    .label{font-size:16px;font-weight:800}.small{font-size:13.4px;fill:#334155}.tiny{font-size:12px;fill:#64748b}.chipText{font-size:12px;font-weight:800;fill:#fff}
+    .arrow{stroke:#334155;stroke-width:2.6;fill:none;marker-end:url(#arrowhead)}.arrow-blue{stroke:#2563eb}.arrow-green{stroke:#059669}.arrow-purple{stroke:#7c3aed}.arrow-amber{stroke:#d97706}.arrow-rose{stroke:#e11d48}.dashed{stroke-dasharray:9 7}.thin{stroke-width:1.9}
+    .note{font-size:12.5px;fill:#475569;font-weight:700}.badge{rx:999;ry:999;filter:url(#shadow)}
+  </style>
+</defs>
+<rect width="100%" height="100%" fill="url(#pageBg)"/>
+<circle cx="1580" cy="80" r="120" fill="#dbeafe" opacity=".55"/><circle cx="240" cy="1220" r="180" fill="#fef3c7" opacity=".55"/>
+<text x="70" y="64" class="title">Constellar · Oracle Swarm + Gateway Nanopayments Architecture</text>
+<text x="70" y="94" class="subtitle">User channels → webapp → backend workers → x402 HTTP negotiation → Circle Gateway batch settlement → on-chain Arc/EVM state.</text>
+
+<g>
+  <rect x="50" y="130" width="1700" height="122" class="group "/>
+  <text x="74" y="164" class="group-title">User Entry Points</text>
+  <text x="74" y="186" class="group-sub">Social and wallet-based ways to create or monitor markets</text>
+</g>
+<g>
+  <rect x="90" y="175" width="320" height="78" class="box box-blue"/>
+  <text x="112" y="207" class="label">Telegram Bot</text>
+  
+  <text x="112" y="235" class="small" text-anchor="start">tgbot: chat commands / alerts</text>
+
+</g>
+<g>
+  <rect x="450" y="175" width="320" height="78" class="box box-blue"/>
+  <text x="472" y="207" class="label">X / Twitter Bot</text>
+  
+  <text x="472" y="235" class="small" text-anchor="start">xbot: mentions → proposals</text>
+
+</g>
+<g>
+  <rect x="810" y="175" width="360" height="78" class="box box-blue"/>
+  <text x="832" y="207" class="label">Web UI + Wallet</text>
+  
+  <text x="832" y="235" class="small" text-anchor="start">React + Vite + wagmi + SIWE</text>
+
+</g>
+<g>
+  <rect x="1210" y="175" width="480" height="78" class="box box-purple"/>
+  <text x="1232" y="207" class="label">Constellar Intent Layer</text>
+  
+  <text x="1232" y="235" class="small" text-anchor="start">parse market intent, route funding, trigger settlement</text>
+
+</g>
+<g>
+  <rect x="50" y="285" width="790" height="240" class="group "/>
+  <text x="74" y="319" class="group-title">Frontend · webapp</text>
+  <text x="74" y="341" class="group-sub">Pages, wallets, live swarm data, consensus visualization</text>
+</g>
+<g>
+  <rect x="85" y="350" width="330" height="135" class="box box-cyan"/>
+  <text x="107" y="382" class="label">Pages</text>
+  
+  <text x="107" y="410" class="small" text-anchor="start">Home / Explore / Bet / EventMarket</text>
+<text x="107" y="429" class="small" text-anchor="start">CreateMarket / Stats / OracleSwarmPage</text>
+<text x="107" y="448" class="small" text-anchor="start">ConsensusCard with tx links</text>
+
+</g>
+<g>
+  <rect x="455" y="350" width="345" height="135" class="box box-cyan"/>
+  <text x="477" y="382" class="label">Hooks + Auth</text>
+  
+  <text x="477" y="410" class="small" text-anchor="start">useSwarmSse: live consensus stream</text>
+<text x="477" y="429" class="small" text-anchor="start">useSwarmSimulation: dry-run UI</text>
+<text x="477" y="448" class="small" text-anchor="start">wagmi writes + AuthProvider(SIWE)</text>
+
+</g>
+<g>
+  <rect x="880" y="285" width="870" height="240" class="group "/>
+  <text x="904" y="319" class="group-title">Bot Backend · Node + Express + Prisma</text>
+  <text x="904" y="341" class="group-sub">PM2 services, API routes, workers, state machine, locks</text>
+</g>
+<g>
+  <rect x="915" y="350" width="250" height="135" class="box box-green"/>
+  <text x="937" y="382" class="label">API Service</text>
+  
+  <text x="937" y="410" class="small" text-anchor="start">/api/swarm/stream</text>
+<text x="937" y="429" class="small" text-anchor="start">/snapshot /latest-consensus</text>
+<text x="937" y="448" class="small" text-anchor="start">/heartbeat /nanopay</text>
+
+</g>
+<g>
+  <rect x="1195" y="350" width="245" height="135" class="box box-green"/>
+  <text x="1217" y="382" class="label">Workers</text>
+  
+  <text x="1217" y="410" class="small" text-anchor="start">event-settlement cron</text>
+<text x="1217" y="429" class="small" text-anchor="start">bet-listener / claim-worker</text>
+<text x="1217" y="448" class="small" text-anchor="start">verify / reconciler</text>
+
+</g>
+<g>
+  <rect x="1470" y="350" width="245" height="135" class="box box-green"/>
+  <text x="1492" y="382" class="label">Data + Chain I/O</text>
+  
+  <text x="1492" y="410" class="small" text-anchor="start">Prisma/Postgres models</text>
+<text x="1492" y="429" class="small" text-anchor="start">viem clients per chain</text>
+<text x="1492" y="448" class="small" text-anchor="start">DB-backed WorkerLease</text>
+
+</g>
+<g>
+  <rect x="50" y="560" width="525" height="360" class="group "/>
+  <text x="74" y="594" class="group-title">Nanopayments · x402 HTTP Layer</text>
+  <text x="74" y="616" class="group-sub">How Constellar negotiates each oracle payment</text>
+</g>
+<g>
+  <rect x="85" y="625" width="445" height="112" class="box box-amber"/>
+  <text x="107" y="657" class="label">x402 Protocol</text>
+  
+  <text x="107" y="685" class="small" text-anchor="start">HTTP 402 Payment Required</text>
+<text x="107" y="704" class="small" text-anchor="start">EIP-3009 TransferWithAuthorization signature</text>
+<text x="107" y="723" class="small" text-anchor="start">X-PAYMENT header sent by GatewayClient.pay(url)</text>
+
+</g>
+<g>
+  <rect x="85" y="765" width="445" height="112" class="box box-amber"/>
+  <text x="107" y="797" class="label">Payment Tiers</text>
+  
+  <text x="107" y="825" class="small" text-anchor="start">/evidence  = 1000µ</text>
+<text x="107" y="844" class="small" text-anchor="start">/summarize = 3000µ</text>
+<text x="107" y="863" class="small" text-anchor="start">/verdict   = 5000µ</text>
+
+</g>
+<g>
+  <rect x="615" y="560" width="535" height="360" class="group "/>
+  <text x="639" y="594" class="group-title">Circle Gateway Batch Settlement</text>
+  <text x="639" y="616" class="group-sub">Seller submits signatures; Gateway verifies, nets, and batches settlement</text>
+</g>
+<g>
+  <rect x="650" y="625" width="455" height="112" class="box box-indigo"/>
+  <text x="672" y="657" class="label">Gateway Wallet Deposit</text>
+  
+  <text x="672" y="685" class="small" text-anchor="start">Bot deposits USDC once</text>
+<text x="672" y="704" class="small" text-anchor="start">Gateway balance funds future oracle calls</text>
+<text x="672" y="723" class="small" text-anchor="start">No per-call source-chain transfer tx</text>
+
+</g>
+<g>
+  <rect x="650" y="765" width="455" height="112" class="box box-indigo"/>
+  <text x="672" y="797" class="label">Gateway Facilitator + TEE</text>
+  
+  <text x="672" y="825" class="small" text-anchor="start">createGatewayMiddleware submits signatures</text>
+<text x="672" y="844" class="small" text-anchor="start">AWS Nitro TEE verifies + accounts</text>
+<text x="672" y="863" class="small" text-anchor="start">Netting + batch on-chain settlement</text>
+
+</g>
+<g>
+  <rect x="1190" y="560" width="560" height="360" class="group "/>
+  <text x="1214" y="594" class="group-title">Oracle Swarm · 5 PM2 Express Nodes</text>
+  <text x="1214" y="616" class="group-sub">Oracle nodes no longer need chain keys for every payment</text>
+</g>
+<g>
+  <rect x="1225" y="625" width="240" height="112" class="box box-purple"/>
+  <text x="1247" y="657" class="label">Evidence Oracles</text>
+  
+  <text x="1247" y="685" class="small" text-anchor="start">twitter :4001</text>
+<text x="1247" y="704" class="small" text-anchor="start">google :4002</text>
+<text x="1247" y="723" class="small" text-anchor="start">news :4003</text>
+
+</g>
+<g>
+  <rect x="1490" y="625" width="225" height="112" class="box box-purple"/>
+  <text x="1512" y="657" class="label">Community Oracles</text>
+  
+  <text x="1512" y="685" class="small" text-anchor="start">reddit :4004</text>
+<text x="1512" y="704" class="small" text-anchor="start">youtube :4005</text>
+<text x="1512" y="723" class="small" text-anchor="start">Gemini reasoning</text>
+
+</g>
+<g>
+  <rect x="1225" y="765" width="490" height="112" class="box box-purple"/>
+  <text x="1247" y="797" class="label">Oracle Middleware</text>
+  
+  <text x="1247" y="825" class="small" text-anchor="start">createGatewayMiddleware verifies x402 flow</text>
+<text x="1247" y="844" class="small" text-anchor="start">No oracle wallet chain key needed</text>
+<text x="1247" y="863" class="small" text-anchor="start">Returns evidence → summarize → verdict</text>
+
+</g>
+<g>
+  <rect x="50" y="960" width="525" height="250" class="group "/>
+  <text x="74" y="994" class="group-title">External Data Feeds</text>
+  <text x="74" y="1016" class="group-sub">Evidence and LLM sources</text>
+</g>
+<g>
+  <rect x="85" y="1025" width="445" height="135" class="box box-slate"/>
+  <text x="107" y="1057" class="label">Data APIs</text>
+  
+  <text x="107" y="1085" class="small" text-anchor="start">X API v2 / Google CSE / GDELT 2.0</text>
+<text x="107" y="1104" class="small" text-anchor="start">Reddit / YouTube Data API</text>
+<text x="107" y="1123" class="small" text-anchor="start">Gemini API + bot-only OpenAI / Coingecko</text>
+
+</g>
+<g>
+  <rect x="615" y="960" width="535" height="250" class="group "/>
+  <text x="639" y="994" class="group-title">On-chain · Arc Testnet</text>
+  <text x="639" y="1016" class="group-sub">Constellar native settlement and reputation</text>
+</g>
+<g>
+  <rect x="650" y="1025" width="455" height="135" class="box box-green"/>
+  <text x="672" y="1057" class="label">Arc Contracts</text>
+  
+  <text x="672" y="1085" class="small" text-anchor="start">EventBet.resolve(outcome, reasoning)</text>
+<text x="672" y="1104" class="small" text-anchor="start">OracleRegistry.applyOutcome(tokenIds, deltas)</text>
+<text x="672" y="1123" class="small" text-anchor="start">USDC settlement from Gateway batch tx</text>
+
+</g>
+<g>
+  <rect x="1190" y="960" width="560" height="250" class="group "/>
+  <text x="1214" y="994" class="group-title">On-chain · Base / Other EVM</text>
+  <text x="1214" y="1016" class="group-sub">Market contracts and bootstrap liquidity demo</text>
+</g>
+<g>
+  <rect x="1225" y="1025" width="490" height="135" class="box box-blue"/>
+  <text x="1247" y="1057" class="label">EVM Contracts + Liquidity</text>
+  
+  <text x="1247" y="1085" class="small" text-anchor="start">BetFactory → Bet / EventBetFactory → EventBet</text>
+<text x="1247" y="1104" class="small" text-anchor="start">PriceOracleFactory → Oracle</text>
+<text x="1247" y="1123" class="small" text-anchor="start">Uniswap routing + bootstrap liquidity demo</text>
+
+</g><path d="M170,252 L170,285" class="arrow arrow-blue"/>
+<path d="M610,252 L610,285" class="arrow arrow-blue"/>
+<path d="M1450,252 L1450,285" class="arrow arrow-blue"/>
+<path d="M840,405 L880,405" class="arrow arrow-green"/>
+<path d="M1165,420 L1195,420" class="arrow arrow-green"/>
+<path d="M1318,485 C811.5,485 811.5,625 305,625" class="arrow arrow-amber dashed"/>
+<path d="M530,681 L650,681" class="arrow arrow-amber"/>
+<path d="M1105,681 L1225,681" class="arrow arrow-purple"/>
+<path d="M1470,737 L1470,765" class="arrow arrow-purple"/>
+<path d="M1440,765 C1170.0,765 1170.0,1025 900,1025" class="arrow arrow-green"/>
+<path d="M1340,765 C825.0,765 825.0,1025 310,1025" class="arrow arrow-rose dashed"/>
+<path d="M1440,485 C1170.0,485 1170.0,625 900,625" class="arrow arrow-purple dashed"/>
+<path d="M1700,840 C1585.0,840 1585.0,1025 1470,1025" class="arrow arrow-blue dashed"/>
+<path d="M900,877 C900.0,877 900.0,1025 900,1025" class="arrow arrow-green"/>
+<rect x="690" y="587" width="285" height="28" class="badge" fill="#6366f1"/><text x="832" y="606" class="chipText" text-anchor="middle">Batch settlement instead of tx-per-payment</text>
+<rect x="1260" y="587" width="370" height="28" class="badge" fill="#8b5cf6"/><text x="1445" y="606" class="chipText" text-anchor="middle">Oracle nodes do not need chain transaction keys</text>
+<text x="70" y="1264" class="note">Upgrade: old flow = bot signs EIP-3009 → oracle sends transferWithAuthorization on Arc per payment. New flow = bot deposits to Gateway Wallet → GatewayClient.pay(url) → middleware forwards signature → Gateway TEE verifies/accounts/nets → batched chain settlement.</text>
+</svg>
