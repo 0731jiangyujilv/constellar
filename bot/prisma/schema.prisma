@@ -1,0 +1,313 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  tgId          BigInt   @id
+  walletAddress String?  @db.VarChar(42)
+  username      String?  @db.VarChar(255)
+  createdAt     DateTime @default(now())
+
+  betsCreated Bet[]      @relation("creator")
+  positions   Position[]
+
+  @@map("users")
+}
+
+enum BetStatus {
+  PROPOSED
+  OPEN
+  LOCKED
+  SETTLED
+  CANCELLED
+  EXPIRED
+}
+
+model Bet {
+  id              Int       @id @default(autoincrement())
+  uuid            String    @unique @default(uuid())
+  chainId         Int       @default(84532)
+  betId           Int?
+  contractAddress String?   @db.VarChar(42)
+  creatorTgId     BigInt
+  asset           String    @db.VarChar(20)
+  minAmount       Decimal
+  maxAmount       Decimal
+  duration        Int
+  bettingDeadline DateTime?
+  status          BetStatus @default(PROPOSED)
+  messageId       BigInt?
+  chatId          BigInt
+  createdAt       DateTime  @default(now())
+  startTime       DateTime?
+  endTime         DateTime?
+  startPrice      String?   @db.VarChar(40)
+  endPrice        String?   @db.VarChar(40)
+  winningSide     String?   @db.VarChar(4)
+  isDraw          Boolean   @default(false)
+  totalUp         Decimal   @default(0)
+  totalDown       Decimal   @default(0)
+  txHash          String?   @db.VarChar(66)
+
+  creator   User       @relation("creator", fields: [creatorTgId], references: [tgId])
+  positions Position[]
+
+  @@unique([chainId, betId])
+  @@unique([chainId, contractAddress])
+  @@index([chainId, status])
+  @@map("bets")
+}
+
+model Position {
+  id      Int     @id @default(autoincrement())
+  betId   Int
+  tgId    BigInt
+  chainId Int     @default(84532)
+  side    String  @db.VarChar(4) // "UP" or "DOWN"
+  amount  Decimal
+  claimed Boolean @default(false)
+
+  bet  Bet  @relation(fields: [betId], references: [id])
+  user User @relation(fields: [tgId], references: [tgId])
+
+  @@unique([betId, tgId])
+  @@index([chainId])
+  @@map("positions")
+}
+
+enum ProposalStatus {
+  PROPOSED
+  OPEN
+  LOCKED
+  SETTLED
+  CANCELLED
+}
+
+enum ProposalType {
+  PRICE_BET
+  EVENT_BET
+}
+
+model XUser {
+  id            Int         @id @default(autoincrement())
+  xUserId       String      @unique @db.VarChar(64)
+  username      String?     @db.VarChar(255)
+  walletAddress String?     @unique @db.VarChar(42)
+  createdAt     DateTime    @default(now())
+  proposals     XProposal[]
+
+  @@map("x_users")
+}
+
+model XProposal {
+  id                   Int            @id @default(autoincrement())
+  uuid                 String         @unique @default(uuid())
+  chainId              Int            @default(84532)
+  tweetId              String         @unique @db.VarChar(64)
+  conversationId       String?        @db.VarChar(64)
+  creatorXUserId       String         @db.VarChar(64)
+  creatorUsername       String?        @db.VarChar(255)
+  creatorWallet        String?        @db.VarChar(42)
+  asset                String         @db.VarChar(20)
+  minAmount            Decimal
+  maxAmount            Decimal
+  duration             Int
+  status               ProposalStatus @default(PROPOSED)
+  proposalReplyTweetId String?        @db.VarChar(64)
+  announcementTweetId  String?        @db.VarChar(64)
+  settlementTweetId    String?        @db.VarChar(64)
+  contractAddress      String?        @db.VarChar(42)
+  onChainBetId         Int?
+  txHash               String?        @db.VarChar(66)
+  bettingDeadline      DateTime?
+  startTime            DateTime?
+  endTime              DateTime?
+  startPrice           String?        @db.VarChar(40)
+  endPrice             String?        @db.VarChar(40)
+  winningSide          String?        @db.VarChar(8)
+  isDraw               Boolean        @default(false)
+  totalUp              Decimal        @default(0)
+  totalDown            Decimal        @default(0)
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  // Event bet fields
+  type             ProposalType @default(PRICE_BET)
+  question         String?      @db.Text
+  dataSourceType   String?      @db.VarChar(20)
+  dataSourceConfig String?      @db.Text
+  outcome          String?      @db.VarChar(10)
+  totalYes         Decimal      @default(0)
+  totalNo          Decimal      @default(0)
+
+  creator XUser @relation(fields: [creatorXUserId], references: [xUserId])
+
+  @@unique([chainId, contractAddress])
+  @@unique([chainId, onChainBetId])
+  @@index([status])
+  @@index([chainId, status])
+  @@index([type, status])
+  @@map("x_proposals")
+}
+
+model Cursor {
+  key       String   @id @db.VarChar(100)
+  value     String   @db.VarChar(255)
+  updatedAt DateTime @updatedAt
+
+  @@map("x_cursors")
+}
+
+model OracleRegistry {
+  chainId       Int      @default(84532)
+  asset         String   @db.VarChar(50)
+  oracleAddress String   @db.VarChar(42)
+  decimals      Int
+  description   String   @db.VarChar(255)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@id([chainId, asset])
+  @@unique([chainId, oracleAddress])
+  @@map("oracle_registry")
+}
+
+model WorkerLease {
+  key       String   @id @db.VarChar(100)
+  owner     String   @db.VarChar(100)
+  expiresAt DateTime
+  updatedAt DateTime @updatedAt
+
+  @@map("worker_leases")
+}
+
+enum VerificationKind {
+  BET
+  PRICE_ORACLE
+  EVENT_BET
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFYING
+  VERIFIED
+  FAILED
+}
+
+model ContractVerification {
+  contractAddress String             @id @db.VarChar(42)
+  chainId         Int                @default(84532)
+  kind            VerificationKind
+  status          VerificationStatus @default(PENDING)
+  verifyAttempts  Int                @default(0)
+  txHash          String?            @db.VarChar(66)
+  lastError       String?            @db.Text
+  verifiedAt      DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([status, kind])
+  @@index([chainId])
+  @@map("contract_verifications")
+}
+
+// --- Batch Oracle Job Tracking ---
+
+enum BatchOracleStep {
+  PENDING
+  ORACLE_CREATED
+  REPORTER_SET
+  FEED_SET
+  DONE
+  FAILED
+}
+
+model BatchOracleJob {
+  chainId   Int
+  asset     String           @db.VarChar(50)
+  step      BatchOracleStep  @default(PENDING)
+  attempts  Int              @default(0)
+  lastError String?          @db.Text
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@id([chainId, asset])
+  @@index([chainId, step])
+  @@map("batch_oracle_jobs")
+}
+
+// --- SIWE Authentication ---
+
+model SiweNonce {
+  nonce     String   @id @db.VarChar(64)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("siwe_nonces")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  address   String   @db.VarChar(42)
+  chainId   Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([address, chainId])
+  @@map("sessions")
+}
+
+// --- Oracle Swarm Telemetry ---
+
+model SwarmNanopay {
+  id               String   @id @db.VarChar(80)
+  ts               DateTime
+  oracleId         String   @db.VarChar(80)
+  oracleEmoji      String   @db.VarChar(8)
+  oracleName       String   @db.VarChar(80)
+  kind             String   @db.VarChar(16)
+  amountUsdc       Decimal
+  txHash           String   @db.VarChar(80)
+  verdict          String?  @db.VarChar(4)
+  confidence       Float?
+  // Circle Gateway batching metadata — null for legacy rows recorded before migration
+  batchId          String?  @db.VarChar(64)
+  transferId       String?  @db.VarChar(80)
+  status           String?  @db.VarChar(16)
+  settlementTxHash String?  @db.VarChar(80)
+  payer            String?  @db.VarChar(64)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([ts(sort: Desc)])
+  @@index([batchId])
+  @@index([status, transferId])
+  @@map("swarm_nanopays")
+}
+
+model SwarmConsensus {
+  id                Int      @id @default(autoincrement())
+  ts                DateTime
+  chainId           Int?
+  betId             Int?
+  question          String   @db.Text
+  topic             String   @db.Text
+  outcome           String   @db.VarChar(4)
+  spread            Float
+  yesWeight         Float
+  noWeight          Float
+  totalNanopayments Int
+  totalSpentUsdc    Decimal
+  resolutionTxHash  String?  @db.VarChar(80)
+  perOracle         Json
+  createdAt         DateTime @default(now())
+
+  @@index([ts(sort: Desc)])
+  @@map("swarm_consensus")
+}
