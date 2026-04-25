@@ -1,12 +1,13 @@
 import { PERSONAS, config } from '@/common/config'
+import { geminiExtractSearchQuery } from '@/common/gemini'
 import { createOracleApp } from '@/common/oracle-app'
-import { makeStubEvidence } from '@/common/stub'
 import type { EvidenceItem } from '@/common/types'
 
 async function fetchFromGdelt(topic: string): Promise<EvidenceItem[]> {
   try {
+    const keywords = await geminiExtractSearchQuery(topic, 'news headlines')
     const url = new URL(config.GDELT_API_URL)
-    url.searchParams.set('query', `${topic} sourcelang:english`)
+    url.searchParams.set('query', `${keywords} sourcelang:english`)
     url.searchParams.set('mode', 'artlist')
     url.searchParams.set('format', 'json')
     url.searchParams.set('maxrecords', '10')
@@ -32,7 +33,7 @@ async function fetchFromGdelt(topic: string): Promise<EvidenceItem[]> {
 
 const cache = new Map<string, { items: EvidenceItem[]; idx: number }>()
 
-createOracleApp(PERSONAS.news, async ({ topic, cursor }) => {
+createOracleApp(PERSONAS.news, async ({ topic }) => {
   const key = topic.toLowerCase()
   let state = cache.get(key)
   if (!state || state.idx >= state.items.length) {
@@ -42,6 +43,5 @@ createOracleApp(PERSONAS.news, async ({ topic, cursor }) => {
   }
   const item = state.items[state.idx]
   state.idx += 1
-  if (item) return { ...item, cursor: String(state.idx) }
-  return makeStubEvidence(topic, 'news', cursor)
+  return item ? { ...item, cursor: String(state.idx) } : null
 })

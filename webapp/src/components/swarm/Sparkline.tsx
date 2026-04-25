@@ -7,7 +7,7 @@ type Props = {
   dim?: boolean
 }
 
-export function Sparkline({ data, width = 220, height = 40, max, accent = '#10F3B5', dim = false }: Props) {
+export function Sparkline({ data, width = 220, height = 40, max, accent = '#3c8aff', dim = false }: Props) {
   if (data.length === 0) return null
   const peak = max ?? Math.max(...data, 1)
   const step = width / Math.max(data.length - 1, 1)
@@ -23,11 +23,11 @@ export function Sparkline({ data, width = 220, height = 40, max, accent = '#10F3
 
   const lastVal = data[data.length - 1]
   const lastColor = dim
-    ? '#3a3f4b'
+    ? '#717886'
     : lastVal > peak * 0.75
-      ? '#FF3B5C'
+      ? '#fc401f'
       : lastVal > peak * 0.5
-        ? '#FFC44D'
+        ? '#ffd12f'
         : accent
 
   return (
@@ -39,7 +39,7 @@ export function Sparkline({ data, width = 220, height = 40, max, accent = '#10F3
         </linearGradient>
       </defs>
       <path d={area} fill={`url(#grad-${accent})`} />
-      <path d={path} fill="none" stroke={dim ? '#cbd5e1' : accent} strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+      <path d={path} fill="none" stroke={dim ? '#dee1e7' : accent} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
       {!dim && points.length > 0 && (
         <circle cx={points[points.length - 1][0]} cy={points[points.length - 1][1]} r="2.5" fill={lastColor}>
           <animate attributeName="r" values="2.5;4;2.5" dur="1.6s" repeatCount="indefinite" />

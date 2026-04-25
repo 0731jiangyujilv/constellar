@@ -1,14 +1,15 @@
 import { PERSONAS, config } from '@/common/config'
+import { geminiExtractSearchQuery } from '@/common/gemini'
 import { createOracleApp } from '@/common/oracle-app'
-import { makeStubEvidence } from '@/common/stub'
 import type { EvidenceItem } from '@/common/types'
 
 async function fetchFromYoutube(topic: string): Promise<EvidenceItem[]> {
   if (!config.YOUTUBE_API_KEY) return []
   try {
+    const keywords = await geminiExtractSearchQuery(topic, 'youtube video search')
     const url = new URL('https://www.googleapis.com/youtube/v3/search')
     url.searchParams.set('key', config.YOUTUBE_API_KEY)
-    url.searchParams.set('q', topic)
+    url.searchParams.set('q', keywords)
     url.searchParams.set('part', 'snippet')
     url.searchParams.set('type', 'video')
     url.searchParams.set('order', 'date')
@@ -34,7 +35,7 @@ async function fetchFromYoutube(topic: string): Promise<EvidenceItem[]> {
 
 const cache = new Map<string, { items: EvidenceItem[]; idx: number }>()
 
-createOracleApp(PERSONAS.youtube, async ({ topic, cursor }) => {
+createOracleApp(PERSONAS.youtube, async ({ topic }) => {
   const key = topic.toLowerCase()
   let state = cache.get(key)
   if (!state || state.idx >= state.items.length) {
@@ -44,6 +45,5 @@ createOracleApp(PERSONAS.youtube, async ({ topic, cursor }) => {
   }
   const item = state.items[state.idx]
   state.idx += 1
-  if (item) return { ...item, cursor: String(state.idx) }
-  return makeStubEvidence(topic, 'youtube', cursor)
+  return item ? { ...item, cursor: String(state.idx) } : null
 })

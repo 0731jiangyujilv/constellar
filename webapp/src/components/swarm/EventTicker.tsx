@@ -12,17 +12,17 @@ const KIND_LABEL: Record<NanoPayment['kind'], string> = {
 }
 
 const KIND_COLOR: Record<NanoPayment['kind'], string> = {
-  evidence: '#0052ff',
-  summarize: '#FFC44D',
-  verdict: '#10F3B5',
+  evidence: '#0000ff',
+  summarize: '#ffd12f',
+  verdict: '#3c8aff',
 }
 
 const STATUS_META: Record<NanopayStatus, { label: string; color: string; dot: string }> = {
-  received: { label: 'RECEIVED', color: '#0052ff', dot: 'bg-[#0052ff]' },
-  batched: { label: 'BATCHED', color: '#FFC44D', dot: 'bg-[#FFC44D]' },
-  confirmed: { label: 'CONFIRMED', color: '#0052ff', dot: 'bg-[#0052ff]' },
-  completed: { label: 'SETTLED', color: '#10F3B5', dot: 'bg-[#10F3B5]' },
-  failed: { label: 'FAILED', color: '#FF3B5C', dot: 'bg-[#FF3B5C]' },
+  received: { label: 'RECEIVED', color: '#0000ff', dot: 'bg-[#0000ff]' },
+  batched: { label: 'BATCHED', color: '#ffd12f', dot: 'bg-[#ffd12f]' },
+  confirmed: { label: 'CONFIRMED', color: '#0000ff', dot: 'bg-[#0000ff]' },
+  completed: { label: 'SETTLED', color: '#3c8aff', dot: 'bg-[#3c8aff]' },
+  failed: { label: 'FAILED', color: '#fc401f', dot: 'bg-[#fc401f]' },
 }
 
 function fmtTime(ts: number): string {
@@ -101,24 +101,24 @@ export function EventTicker({ events }: Props) {
   const groups = groupByBatch(events)
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white shadow-[0_2px_12px_-4px_rgba(0,82,255,0.06)]">
-      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
+    <div className="rounded-2xl border border-[#dee1e7] bg-white shadow-[0_2px_12px_-4px_rgba(0,0,255,0.10)]">
+      <div className="flex items-center justify-between border-b border-[#dee1e7] px-5 py-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#0052ff] opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#0052ff]" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3c8aff] opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#3c8aff]" />
           </span>
-          <h3 className="font-mono text-[11px] font-semibold tracking-[0.22em] text-slate-900">
+          <h3 className="font-mono text-[11px] font-semibold tracking-[0.22em] text-[#0a0b0d]">
             NANOPAYMENT STREAM · x402
           </h3>
-          <span className="ml-2 rounded-sm border border-[#10F3B5]/30 bg-[#10F3B5]/10 px-1.5 py-0.5 font-mono text-[9px] tracking-[0.18em] text-[#10F3B5]">
+          <span className="ml-2 rounded-sm border border-[#3c8aff]/30 bg-[#3c8aff]/10 px-1.5 py-0.5 font-mono text-[9px] tracking-[0.18em] text-[#3c8aff]">
             CIRCLE GATEWAY · BATCHED
           </span>
         </div>
-        <div className="flex items-center gap-3 font-mono text-[9px] tracking-[0.16em] text-slate-400">
-          <LegendDot color="#0052ff" label="EVIDENCE $0.001" />
-          <LegendDot color="#FFC44D" label="SUMMARIZE $0.003" />
-          <LegendDot color="#10F3B5" label="VERDICT $0.005" />
+        <div className="flex items-center gap-3 font-mono text-[9px] tracking-[0.16em] text-[#b1b7c3]">
+          <LegendDot color="#0000ff" label="EVIDENCE $0.001" />
+          <LegendDot color="#ffd12f" label="SUMMARIZE $0.003" />
+          <LegendDot color="#3c8aff" label="VERDICT $0.005" />
         </div>
       </div>
 
@@ -128,11 +128,11 @@ export function EventTicker({ events }: Props) {
           style={{ contain: 'paint' }}
         >
           {events.length === 0 ? (
-            <div className="flex h-[420px] items-center justify-center font-mono text-[11px] text-slate-400">
+            <div className="flex h-[420px] items-center justify-center font-mono text-[11px] text-[#b1b7c3]">
               waiting for swarm activity…
             </div>
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-[#eef0f3]">
               {groups.map((g, gi) =>
                 g.kind === 'solo' ? (
                   <SoloRow key={g.event.id} event={g.event} fade={Math.max(0.45, 1 - gi * 0.008)} />
@@ -157,37 +157,37 @@ function SoloRow({ event: e, fade }: { event: NanoPayment; fade: number }) {
       className="grid grid-cols-[90px_36px_1fr_90px_70px_100px] items-center gap-3 px-5 py-2 font-mono text-[11px] animate-[event-slide_0.4s_ease-out]"
       style={{ opacity: fade }}
     >
-      <span className="tabular-nums text-slate-400">{fmtTime(e.ts)}</span>
+      <span className="tabular-nums text-[#b1b7c3]">{fmtTime(e.ts)}</span>
       <span className="text-xl leading-none">{e.oracleEmoji}</span>
-      <span className="truncate text-slate-700">
-        <span className="text-slate-900">{e.oracleName}</span>
-        <span className="text-slate-400"> · </span>
+      <span className="truncate text-[#32353d]">
+        <span className="text-[#0a0b0d]">{e.oracleName}</span>
+        <span className="text-[#b1b7c3]"> · </span>
         <span style={{ color: KIND_COLOR[e.kind] }}>{KIND_LABEL[e.kind]}</span>
         {e.verdict && (
           <>
-            <span className="text-slate-400"> → </span>
-            <span className={e.verdict === 'YES' ? 'text-[#10F3B5]' : 'text-[#FF3B5C]'}>{e.verdict}</span>
-            <span className="ml-1 text-slate-500">{e.confidence?.toFixed(2)}</span>
+            <span className="text-[#b1b7c3]"> → </span>
+            <span className={e.verdict === 'YES' ? 'text-[#3c8aff]' : 'text-[#fc401f]'}>{e.verdict}</span>
+            <span className="ml-1 text-[#717886]">{e.confidence?.toFixed(2)}</span>
           </>
         )}
       </span>
-      <span className="tabular-nums text-[#10F3B5]">${e.amountUsdc.toFixed(4)}</span>
+      <span className="tabular-nums text-[#3c8aff]">${e.amountUsdc.toFixed(4)}</span>
       {href ? (
         <a
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="tabular-nums text-slate-500 transition hover:text-[#0052ff] hover:underline"
+          className="tabular-nums text-[#717886] transition hover:text-[#3c8aff] hover:underline"
           title={e.settlementTxHash ?? e.txHash}
         >
           {label}
         </a>
       ) : (
-        <span className="tabular-nums text-slate-500" title={e.settlementTxHash ?? e.txHash}>
+        <span className="tabular-nums text-[#717886]" title={e.settlementTxHash ?? e.txHash}>
           {label}
         </span>
       )}
-      <span className="font-mono text-[9px] tracking-[0.16em] text-slate-400 text-right">ARC · SETTLED</span>
+      <span className="font-mono text-[9px] tracking-[0.16em] text-[#b1b7c3] text-right">ARC · SETTLED</span>
     </li>
   )
 }
@@ -206,7 +206,7 @@ function BatchBlock({ batchId, events, fade }: { batchId: string; events: NanoPa
       />
 
       {/* Batch header */}
-      <div className="grid grid-cols-[1fr_auto] items-center gap-3 bg-slate-50 px-5 py-2 pl-6">
+      <div className="grid grid-cols-[1fr_auto] items-center gap-3 bg-[#eef0f3] px-5 py-2 pl-6">
         <div className="flex min-w-0 items-center gap-3 font-mono text-[10px] tracking-[0.18em]">
           <span
             className="rounded-sm px-2 py-0.5 text-[10px] font-semibold tracking-[0.2em]"
@@ -218,15 +218,15 @@ function BatchBlock({ batchId, events, fade }: { batchId: string; events: NanoPa
           >
             BATCH
           </span>
-          <span className="tabular-nums text-slate-700">#{fmtBatch(batchId)}</span>
-          <span className="text-slate-400">·</span>
-          <span className="text-slate-700">
+          <span className="tabular-nums text-[#32353d]">#{fmtBatch(batchId)}</span>
+          <span className="text-[#b1b7c3]">·</span>
+          <span className="text-[#32353d]">
             <span className="tabular-nums">{events.length}</span>{' '}
-            <span className="text-slate-500">payments</span>
+            <span className="text-[#717886]">payments</span>
           </span>
-          <span className="text-slate-400">·</span>
-          <span className="tabular-nums text-[#10F3B5]">${totalUsdc.toFixed(4)}</span>
-          <span className="text-slate-400">·</span>
+          <span className="text-[#b1b7c3]">·</span>
+          <span className="tabular-nums text-[#3c8aff]">${totalUsdc.toFixed(4)}</span>
+          <span className="text-[#b1b7c3]">·</span>
           <span className="flex items-center gap-1.5">
             <span className={`h-1.5 w-1.5 rounded-full ${meta.dot} ${status === 'received' || status === 'batched' ? 'animate-pulse' : ''}`} />
             <span className="tracking-[0.22em]" style={{ color: meta.color }}>
@@ -240,15 +240,15 @@ function BatchBlock({ batchId, events, fade }: { batchId: string; events: NanoPa
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 rounded border border-[#10F3B5]/30 bg-[#10F3B5]/10 px-2 py-0.5 tabular-nums text-[#10F3B5] transition hover:bg-[#10F3B5]/20"
+              className="flex items-center gap-1 rounded border border-[#3c8aff]/30 bg-[#3c8aff]/10 px-2 py-0.5 tabular-nums text-[#3c8aff] transition hover:bg-[#3c8aff]/20"
               title={settlementTxHash ?? undefined}
             >
-              <span className="text-[9px] tracking-[0.18em] text-slate-500">ONCHAIN</span>
+              <span className="text-[9px] tracking-[0.18em] text-[#717886]">ONCHAIN</span>
               <span>{settlementTxHash ? fmtTx(settlementTxHash) : ''}</span>
-              <span className="text-[9px] text-slate-500">↗</span>
+              <span className="text-[9px] text-[#717886]">↗</span>
             </a>
           ) : (
-            <span className="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] tracking-[0.2em] text-slate-500">
+            <span className="rounded border border-[#dee1e7] bg-[#eef0f3] px-2 py-0.5 text-[9px] tracking-[0.2em] text-[#717886]">
               awaiting batch settle…
             </span>
           )}
@@ -262,28 +262,28 @@ function BatchBlock({ batchId, events, fade }: { batchId: string; events: NanoPa
             key={e.id}
             className="grid grid-cols-[90px_36px_1fr_90px_70px_100px] items-center gap-3 px-5 py-1.5 pl-6 font-mono text-[11px] animate-[event-slide_0.4s_ease-out]"
           >
-            <span className="tabular-nums text-slate-400">{fmtTime(e.ts)}</span>
+            <span className="tabular-nums text-[#b1b7c3]">{fmtTime(e.ts)}</span>
             <span className="text-xl leading-none">{e.oracleEmoji}</span>
-            <span className="truncate text-slate-700">
-              <span className="text-slate-900">{e.oracleName}</span>
-              <span className="text-slate-400"> · </span>
+            <span className="truncate text-[#32353d]">
+              <span className="text-[#0a0b0d]">{e.oracleName}</span>
+              <span className="text-[#b1b7c3]"> · </span>
               <span style={{ color: KIND_COLOR[e.kind] }}>{KIND_LABEL[e.kind]}</span>
               {e.verdict && (
                 <>
-                  <span className="text-slate-400"> → </span>
-                  <span className={e.verdict === 'YES' ? 'text-[#10F3B5]' : 'text-[#FF3B5C]'}>{e.verdict}</span>
-                  <span className="ml-1 text-slate-500">{e.confidence?.toFixed(2)}</span>
+                  <span className="text-[#b1b7c3]"> → </span>
+                  <span className={e.verdict === 'YES' ? 'text-[#3c8aff]' : 'text-[#fc401f]'}>{e.verdict}</span>
+                  <span className="ml-1 text-[#717886]">{e.confidence?.toFixed(2)}</span>
                 </>
               )}
             </span>
-            <span className="tabular-nums text-[#10F3B5]">${e.amountUsdc.toFixed(4)}</span>
+            <span className="tabular-nums text-[#3c8aff]">${e.amountUsdc.toFixed(4)}</span>
             <span
-              className="tabular-nums text-slate-500"
+              className="tabular-nums text-[#717886]"
               title={e.transferId ?? e.txHash}
             >
               {e.transferId ? `xfer ${fmtTx(e.transferId)}` : 'pending'}
             </span>
-            <span className="font-mono text-[9px] tracking-[0.16em] text-slate-400 text-right">via BATCH</span>
+            <span className="font-mono text-[9px] tracking-[0.16em] text-[#b1b7c3] text-right">via BATCH</span>
           </li>
         ))}
       </ul>

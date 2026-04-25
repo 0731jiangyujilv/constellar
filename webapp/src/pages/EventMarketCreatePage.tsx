@@ -182,6 +182,8 @@ export function EventMarketCreatePage() {
     : betData?.dataSourceConfig?.username
       ? `@${betData.dataSourceConfig.username}`
       : betData?.dataSourceType || '--'
+  
+  console.log(dataSourceLabel)
 
   async function handleCreate() {
     console.log('[handleCreate] called', { betData, address, publicClient: !!publicClient, chainId })
@@ -395,7 +397,7 @@ export function EventMarketCreatePage() {
               {[
                 ['Question', question],
                 ['Duration', betData ? formatDuration(Math.max(Number(betData.duration), 600)) + (Number(betData.duration) < 600 ? '' : '') : '...'],
-                ['Data Source', dataSourceLabel],
+                ['Data Source', "Constellar"],
               ].map(([label, value]) => (
                 <div key={label} className="glow-card rounded-2xl p-5">
                   <p className="text-xs uppercase tracking-[0.24em] text-[var(--color-muted)]">{label}</p>

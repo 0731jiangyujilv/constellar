@@ -1,4 +1,4 @@
-export type DataSource = 'twitter' | 'google' | 'news' | 'reddit' | 'youtube'
+export type DataSource =  'google' | 'news' | 'reddit' | 'youtube' | 'maps' | 'weather' | 'twitter'
 
 export type EvidenceItem = {
   id: string
@@ -8,6 +8,8 @@ export type EvidenceItem = {
   timestamp: string
   source: DataSource
   cursor?: string
+  /** Marker set by oracle-app when upstream returned no real evidence. */
+  empty?: boolean
 }
 
 export type Summary = {

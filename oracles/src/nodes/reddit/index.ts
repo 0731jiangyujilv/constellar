@@ -1,12 +1,13 @@
 import { PERSONAS, config } from '@/common/config'
+import { geminiExtractSearchQuery } from '@/common/gemini'
 import { createOracleApp } from '@/common/oracle-app'
-import { makeStubEvidence } from '@/common/stub'
 import type { EvidenceItem } from '@/common/types'
 
 async function fetchFromReddit(topic: string): Promise<EvidenceItem[]> {
   try {
+    const keywords = await geminiExtractSearchQuery(topic, 'reddit posts')
     const url = new URL('https://www.reddit.com/search.json')
-    url.searchParams.set('q', topic)
+    url.searchParams.set('q', keywords)
     url.searchParams.set('sort', 'new')
     url.searchParams.set('limit', '10')
     url.searchParams.set('t', 'day')
@@ -34,7 +35,7 @@ async function fetchFromReddit(topic: string): Promise<EvidenceItem[]> {
 
 const cache = new Map<string, { items: EvidenceItem[]; idx: number }>()
 
-createOracleApp(PERSONAS.reddit, async ({ topic, cursor }) => {
+createOracleApp(PERSONAS.reddit, async ({ topic }) => {
   const key = topic.toLowerCase()
   let state = cache.get(key)
   if (!state || state.idx >= state.items.length) {
@@ -44,6 +45,5 @@ createOracleApp(PERSONAS.reddit, async ({ topic, cursor }) => {
   }
   const item = state.items[state.idx]
   state.idx += 1
-  if (item) return { ...item, cursor: String(state.idx) }
-  return makeStubEvidence(topic, 'reddit', cursor)
+  return item ? { ...item, cursor: String(state.idx) } : null
 })

@@ -10,6 +10,7 @@ import { StatsPage } from '@/pages/StatsPage'
 import { SharePage } from '@/pages/SharePage'
 import { EventMarketCreatePage } from '@/pages/EventMarketCreatePage'
 import { EventMarketPage } from '@/pages/EventMarketPage'
+import { EventOraclesPage } from '@/pages/EventOraclesPage'
 import { ExploreMarketPage } from '@/pages/ExploreMarketPage'
 import { OracleSwarmPage } from '@/pages/OracleSwarmPage'
 
@@ -29,6 +30,7 @@ function App() {
               <Route path="/share/:contractAddress" element={<SharePage />} />
               <Route path="/event/create/:betId" element={<EventMarketCreatePage />} />
               <Route path="/event/:contractAddress" element={<EventMarketPage />} />
+              <Route path="/event/:contractAddress/oracles" element={<EventOraclesPage />} />
               <Route path="/stats" element={<StatsPage />} />
               <Route path="/swarm" element={<OracleSwarmPage />} />
             </Routes>

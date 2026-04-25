@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSwarmSse } from '@/hooks/useSwarmSse'
 import { OracleCard } from '@/components/swarm/OracleCard'
@@ -14,15 +15,15 @@ export function OracleSwarmPage() {
   const registeredCount = nodes.filter((n) => !!n.agentTokenId).length
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#F7F9FC] text-[#0F172A]">
+    <div className="relative min-h-screen overflow-hidden bg-[#eef0f3] text-[#0a0b0d]">
       {/* Ambient backdrop */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background: `
-            radial-gradient(circle at 15% 10%, rgba(0,82,255,0.05), transparent 40%),
-            radial-gradient(circle at 85% 5%, rgba(0,82,255,0.04), transparent 45%),
-            radial-gradient(circle at 50% 100%, rgba(16,243,181,0.03), transparent 50%)
+            radial-gradient(circle at 15% 10%, rgba(0,0,255,0.10), transparent 40%),
+            radial-gradient(circle at 85% 5%, rgba(60,138,255,0.08), transparent 45%),
+            radial-gradient(circle at 50% 100%, rgba(0,0,255,0.06), transparent 50%)
           `,
         }}
       />
@@ -30,7 +31,7 @@ export function OracleSwarmPage() {
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(20,20,20,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(20,20,20,0.04) 1px, transparent 1px)',
+            'linear-gradient(rgba(20,20,20,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(20,20,20,0.07) 1px, transparent 1px)',
           backgroundSize: '48px 48px',
         }}
       />
@@ -38,41 +39,20 @@ export function OracleSwarmPage() {
       <div className="relative mx-auto max-w-[1440px] px-6 py-8 md:px-10">
         {/* Top nav */}
         <header className="mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-[#10F3B5] to-[#0052ff] font-mono text-lg font-bold text-[#07090C]">
-              ⚡
-            </div>
-            <div>
-              <div className="font-mono text-[11px] font-semibold tracking-[0.28em] text-slate-500">
-                POLYPOP · OPERATIONS
-              </div>
-              <h1 className="mt-0.5 font-mono text-xl font-semibold tracking-[-0.01em] text-slate-900">
-                Oracle Swarm Console
-              </h1>
-            </div>
-          </div>
-          <nav className="flex items-center gap-6 font-mono text-[11px] tracking-[0.18em] text-slate-500">
-            <Link to="/" className="transition hover:text-slate-800">
-              ← HOME
-            </Link>
-            <Link to="/explore" className="transition hover:text-slate-800">
-              EXPLORE
-            </Link>
-            <Link to="/stats" className="transition hover:text-slate-800">
-              STATS
-            </Link>
-            <span className="rounded bg-[#0052ff]/10 px-2.5 py-1 text-[#0052ff]">SWARM</span>
+          <h1 className="font-mono text-xl font-bold tracking-[0.08em] text-[#0000ff]">Constellar</h1>
+          <nav className="flex items-center gap-6 font-mono text-[11px] tracking-[0.18em] text-[#717886]">
+            <Link to="/" className="transition hover:text-[#0a0b0d]">← HOME</Link>
+            <Link to="/explore" className="transition hover:text-[#0a0b0d]">EXPLORE</Link>
+            <Link to="/stats" className="transition hover:text-[#0a0b0d]">STATS</Link>
+            <span className="rounded bg-[#0000ff]/10 px-2.5 py-1 text-[#0000ff]">SWARM</span>
           </nav>
         </header>
 
         {/* Tagline / system context */}
         <div className="mb-6 flex items-center gap-4">
-          <div className="inline-flex items-center gap-2 rounded-md border border-[#0052ff]/30 bg-[#0052ff]/5 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-[#8fb0ff] uppercase">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#0052ff]" />
-            5-agent ai oracle · gemini + x402 nanopayments on arc
-          </div>
-          <div className="hidden font-mono text-[10px] tracking-[0.16em] text-slate-400 md:block">
-            autonomous agents resolve prediction markets · priced per evidence · settled sub-cent on arc
+          <div className="inline-flex items-center gap-2 rounded-md border border-[#0000ff]/30 bg-[#0000ff]/5 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-[#3c8aff] uppercase">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#3c8aff]" />
+            AI Agents Oracle Powered by Gemini &amp; x402 Nanopayments on Arc
           </div>
         </div>
 
@@ -134,19 +114,13 @@ export function OracleSwarmPage() {
         </div>
 
         {/* Footer */}
-        <footer className="mt-10 flex items-center justify-between border-t border-slate-200 pt-6 font-mono text-[10px] tracking-[0.16em] text-slate-400">
+        <footer className="mt-10 flex items-center justify-between border-t border-[#dee1e7] pt-6 font-mono text-[10px] tracking-[0.16em] text-[#717886]">
           <div>
-            <span className="text-slate-500">powered by</span>{' '}
-            <span className="text-slate-900">circle nanopayments</span>
-            <span className="mx-2">·</span>
-            <span className="text-slate-900">arc l1</span>
-            <span className="mx-2">·</span>
-            <span className="text-slate-900">usdc gas</span>
-            <span className="mx-2">·</span>
-            <span className="text-slate-900">x402 facilitator</span>
+            <span>Powered by</span>{' '}
+            <span className="font-semibold text-[#0a0b0d]">Gemini &amp; Circle Nanopayments</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#10F3B5]" />
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#3c8aff]" />
             <span>TELEMETRY ACTIVE</span>
           </div>
         </footer>
@@ -168,32 +142,32 @@ function RegistryPanel({ registryAddress, registryLink, registeredCount, nodes }
   const walletExplorer = (addr: string) => arcAddressLink(addr)
 
   return (
-    <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_4px_24px_-8px_rgba(0,82,255,0.10)]">
+    <section className="mt-4 overflow-hidden rounded-2xl border border-[#dee1e7] bg-white shadow-[0_4px_24px_-8px_rgba(0,0,255,0.10)]">
       {/* Header row */}
-      <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 bg-slate-50 px-5 py-3">
-        <span className="rounded border border-[#0052ff]/30 bg-[#0052ff]/10 px-2 py-0.5 font-mono text-[10px] font-semibold tracking-[0.22em] text-[#0052ff]">
+      <div className="flex flex-wrap items-center gap-3 border-b border-[#dee1e7] bg-[#eef0f3] px-5 py-3">
+        <span className="rounded border border-[#0000ff]/30 bg-[#0000ff]/10 px-2 py-0.5 font-mono text-[10px] font-semibold tracking-[0.22em] text-[#0000ff]">
           ERC-8004
         </span>
         <div className="min-w-0">
-          <div className="font-mono text-[13px] font-semibold tracking-[0.16em] text-slate-900">
-            ORACLE REGISTRY
+          <div className="font-mono text-[13px] font-semibold tracking-[0.16em] text-[#0a0b0d]">
+            ORACLE REGISTRATION
           </div>
-          <div className="mt-0.5 font-mono text-[10px] tracking-[0.16em] text-slate-400">
+          <div className="mt-0.5 font-mono text-[10px] tracking-[0.16em] text-[#b1b7c3]">
             identity · reputation · validation (trust layer)
           </div>
         </div>
 
         <div className="ml-auto flex flex-wrap items-center gap-4 font-mono text-[10px] tracking-[0.16em]">
-          <div className="flex items-center gap-1.5 text-slate-500">
+          <div className="flex items-center gap-1.5 text-[#717886]">
             <span>chain</span>
-            <span className="text-slate-700">Arc</span>
+            <span className="text-[#32353d]">Arc</span>
           </div>
-          <div className="flex items-center gap-1.5 text-slate-500">
+          <div className="flex items-center gap-1.5 text-[#717886]">
             <span>agents</span>
-            <span className={`text-[13px] tabular-nums ${allRegistered ? 'text-[#10F3B5]' : 'text-[#FFC44D]'}`}>
+            <span className={`text-[13px] tabular-nums ${allRegistered ? 'text-[#66c800]' : 'text-[#ffd12f]'}`}>
               {registeredCount}
             </span>
-            <span className="text-slate-400">/ {nodes.length || '-'} registered</span>
+            <span className="text-[#b1b7c3]">/ {nodes.length || '-'} registered</span>
           </div>
           {registryAddress ? (
             registryLink ? (
@@ -201,27 +175,27 @@ function RegistryPanel({ registryAddress, registryLink, registeredCount, nodes }
                 href={registryLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-1.5 rounded-md border border-[#0052ff]/25 bg-[#0052ff]/5 px-2.5 py-1 text-slate-700 transition hover:border-[#0052ff]/50 hover:bg-[#0052ff]/10 hover:text-[#0052ff]"
+                className="group flex items-center gap-1.5 rounded-md border border-[#0000ff]/25 bg-[#0000ff]/5 px-2.5 py-1 text-[#32353d] transition hover:border-[#0000ff]/50 hover:bg-[#0000ff]/10 hover:text-[#0000ff]"
                 title={registryAddress}
               >
                 <span className="tabular-nums">{shortAddr(registryAddress, 8, 6)}</span>
-                <span className="text-[9px] text-slate-500 group-hover:text-[#0052ff]">↗ arcscan</span>
+                <span className="text-[9px] text-[#717886] group-hover:text-[#0000ff]">↗ arcscan</span>
               </a>
             ) : (
-              <span className="rounded-md bg-slate-100 px-2.5 py-1 text-slate-700 tabular-nums">
+              <span className="rounded-md bg-[#eef0f3] px-2.5 py-1 text-[#32353d] tabular-nums">
                 {shortAddr(registryAddress, 8, 6)}
               </span>
             )
           ) : (
-            <span className="rounded-md bg-[#FF3B5C]/10 px-2.5 py-1 text-[#FF3B5C]">not deployed</span>
+            <span className="rounded-md bg-[#fc401f]/10 px-2.5 py-1 text-[#fc401f]">not deployed</span>
           )}
         </div>
       </div>
 
       {/* Agent list */}
-      <div className="divide-y divide-slate-100">
+      <div className="divide-y divide-[#eef0f3]">
         {nodes.length === 0 ? (
-          <div className="px-5 py-6 text-center font-mono text-[11px] tracking-[0.16em] text-slate-400">
+          <div className="px-5 py-6 text-center font-mono text-[11px] tracking-[0.16em] text-[#b1b7c3]">
             no agents reporting yet
           </div>
         ) : (
@@ -232,10 +206,10 @@ function RegistryPanel({ registryAddress, registryLink, registeredCount, nodes }
               rep === null
                 ? 'text-slate-400'
                 : rep > 0
-                  ? 'text-[#10F3B5]'
+                  ? 'text-[#66c800]'
                   : rep < 0
-                    ? 'text-[#FF3B5C]'
-                    : 'text-slate-700'
+                    ? 'text-[#fc401f]'
+                    : 'text-[#32353d]'
             const walletLink = walletExplorer(n.walletAddress)
             const readLink = registered && readLinkBase
               ? `${readLinkBase}` // Same read tab; args entered by user
@@ -267,19 +241,19 @@ function RegistryPanel({ registryAddress, registryLink, registeredCount, nodes }
                         target="_blank"
                         rel="noopener noreferrer"
                         title={`read agents(${n.agentTokenId}) on Arc`}
-                        className="inline-flex items-center gap-1 rounded-sm border border-[#0052ff]/25 bg-[#0052ff]/5 px-2 py-0.5 text-[#0052ff] transition hover:border-[#0052ff]/50 hover:bg-[#0052ff]/10"
+                        className="inline-flex items-center gap-1 rounded-sm border border-[#0000ff]/25 bg-[#0000ff]/5 px-2 py-0.5 text-[#0000ff] transition hover:border-[#0000ff]/50 hover:bg-[#0000ff]/10"
                       >
-                        <span className="text-[9px] tracking-[0.14em] text-slate-500">ID</span>
+                        <span className="text-[9px] tracking-[0.14em] text-[#717886]">ID</span>
                         <span className="tabular-nums">#{n.agentTokenId}</span>
                       </a>
                     ) : (
-                      <span className="inline-flex items-center gap-1 rounded-sm border border-slate-200 bg-slate-50 px-2 py-0.5">
-                        <span className="text-[9px] tracking-[0.14em] text-slate-500">ID</span>
-                        <span className="tabular-nums text-slate-700">#{n.agentTokenId}</span>
+                      <span className="inline-flex items-center gap-1 rounded-sm border border-[#dee1e7] bg-[#eef0f3] px-2 py-0.5">
+                        <span className="text-[9px] tracking-[0.14em] text-[#717886]">ID</span>
+                        <span className="tabular-nums text-[#32353d]">#{n.agentTokenId}</span>
                       </span>
                     )
                   ) : (
-                    <span className="inline-flex items-center rounded-sm border border-[#FFC44D]/30 bg-[#FFC44D]/10 px-2 py-0.5 text-[9px] tracking-[0.16em] text-[#FFC44D]">
+                    <span className="inline-flex items-center rounded-sm border border-[#ffd12f]/40 bg-[#ffd12f]/15 px-2 py-0.5 text-[9px] tracking-[0.16em] text-[#5b616e]">
                       UNREGISTERED
                     </span>
                   )}
@@ -292,17 +266,17 @@ function RegistryPanel({ registryAddress, registryLink, registeredCount, nodes }
                       href={walletLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group inline-flex items-center gap-1.5 text-slate-700 transition hover:text-[#0052ff]"
+                      className="group inline-flex items-center gap-1.5 text-[#32353d] transition hover:text-[#0000ff]"
                       title={n.walletAddress}
                     >
-                      <span className="text-[9px] tracking-[0.14em] text-slate-400 group-hover:text-[#0052ff]">
+                      <span className="text-[9px] tracking-[0.14em] text-[#b1b7c3] group-hover:text-[#0000ff]">
                         AGENT
                       </span>
                       <span className="tabular-nums">{shortAddr(n.walletAddress, 6, 4)}</span>
                     </a>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 text-slate-700" title={n.walletAddress}>
-                      <span className="text-[9px] tracking-[0.14em] text-slate-400">AGENT</span>
+                    <span className="inline-flex items-center gap-1.5 text-[#32353d]" title={n.walletAddress}>
+                      <span className="text-[9px] tracking-[0.14em] text-[#b1b7c3]">AGENT</span>
                       <span className="tabular-nums">{shortAddr(n.walletAddress, 6, 4)}</span>
                     </span>
                   )}
@@ -311,14 +285,14 @@ function RegistryPanel({ registryAddress, registryLink, registeredCount, nodes }
                 {/* Reputation */}
                 <div className="text-right">
                   {rep === null ? (
-                    <span className="text-slate-400">—</span>
+                    <span className="text-[#b1b7c3]">—</span>
                   ) : readLink ? (
                     <a
                       href={readLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       title={`read reputation(${n.agentTokenId}) on Arc`}
-                      className="inline-flex items-center gap-1.5 text-slate-500 transition hover:text-slate-700"
+                      className="inline-flex items-center gap-1.5 text-[#717886] transition hover:text-[#32353d]"
                     >
                       <span className="text-[9px] tracking-[0.14em]">REP</span>
                       <span className={`text-[12px] tabular-nums ${repColor}`}>
@@ -326,7 +300,7 @@ function RegistryPanel({ registryAddress, registryLink, registeredCount, nodes }
                       </span>
                     </a>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 text-slate-500">
+                    <span className="inline-flex items-center gap-1.5 text-[#717886]">
                       <span className="text-[9px] tracking-[0.14em]">REP</span>
                       <span className={`text-[12px] tabular-nums ${repColor}`}>
                         {rep > 0 ? '+' : ''}{rep}
@@ -340,19 +314,19 @@ function RegistryPanel({ registryAddress, registryLink, registeredCount, nodes }
                   <span
                     className={`h-1.5 w-1.5 rounded-full ${
                       n.status === 'offline'
-                        ? 'bg-[#FF3B5C]'
+                        ? 'bg-[#fc401f]'
                         : n.status === 'degraded'
-                          ? 'bg-[#FFC44D]'
-                          : 'bg-[#10F3B5] animate-pulse'
+                          ? 'bg-[#ffd12f]'
+                          : 'bg-[#3c8aff] animate-pulse'
                     }`}
                   />
                   <span
                     className={`text-[9px] tracking-[0.2em] ${
                       n.status === 'offline'
-                        ? 'text-[#FF3B5C]'
+                        ? 'text-[#fc401f]'
                         : n.status === 'degraded'
-                          ? 'text-[#FFC44D]'
-                          : 'text-[#10F3B5]'
+                          ? 'text-[#ffd12f]'
+                          : 'text-[#3c8aff]'
                     }`}
                   >
                     {n.status === 'healthy' ? 'LIVE' : n.status === 'degraded' ? 'SLOW' : 'OFFLINE'}
@@ -375,14 +349,14 @@ function fmtTxShort(tx: string): string {
 function TxLink({ tx, className }: { tx: string | null | undefined; className?: string }) {
   if (!tx) return <span className={className ?? ''}>—</span>
   const href = arcTxLink(tx)
-  const base = className ?? 'font-mono text-[11px] tabular-nums text-slate-500'
+  const base = className ?? 'font-mono text-[11px] tabular-nums text-[#717886]'
   if (!href) return <span className={base} title={tx}>{fmtTxShort(tx)}</span>
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`${base} transition hover:text-[#0052ff] hover:underline`}
+      className={`${base} transition hover:text-[#0000ff] hover:underline`}
       title={tx}
     >
       {fmtTxShort(tx)}
@@ -391,14 +365,20 @@ function TxLink({ tx, className }: { tx: string | null | undefined; className?: 
 }
 
 function ConsensusCard({ consensus }: { consensus: LatestConsensus | null }) {
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 5000)
+    return () => clearInterval(id)
+  }, [])
+
   if (!consensus) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="font-mono text-[10px] tracking-[0.22em] text-slate-400">LATEST CONSENSUS</div>
-        <div className="mt-6 text-center font-mono text-[11px] leading-[1.7] text-slate-400">
+      <div className="rounded-2xl border border-[#dee1e7] bg-white p-5">
+        <div className="font-mono text-[10px] tracking-[0.22em] text-[#b1b7c3]">LATEST CONSENSUS</div>
+        <div className="mt-6 text-center font-mono text-[11px] leading-[1.7] text-[#717886]">
           waiting for first swarm resolution…
-          <div className="mt-2 text-[10px] text-slate-400">
-            triggered on the next <span className="text-slate-700">EventBet.resolve()</span>
+          <div className="mt-2 text-[10px] text-[#b1b7c3]">
+            triggered on the next <span className="text-[#32353d]">EventBet.resolve()</span>
           </div>
         </div>
       </div>
@@ -408,25 +388,25 @@ function ConsensusCard({ consensus }: { consensus: LatestConsensus | null }) {
   const totalW = consensus.yesWeight + consensus.noWeight
   const noPct = totalW > 0 ? (consensus.noWeight / totalW) * 100 : 50
   const final = consensus.outcome
-  const settledAgo = Math.max(0, Math.floor((Date.now() - consensus.ts) / 1000))
-  const finalColor = final === 'YES' ? 'text-[#10F3B5] bg-[#10F3B5]/10' : 'text-[#FF3B5C] bg-[#FF3B5C]/10'
+  const settledAgo = Math.max(0, Math.floor((now - consensus.ts) / 1000))
+  const finalColor = final === 'YES' ? 'text-[#3c8aff] bg-[#3c8aff]/10' : 'text-[#fc401f] bg-[#fc401f]/10'
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+    <div className="rounded-2xl border border-[#dee1e7] bg-white p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[10px] tracking-[0.22em] text-slate-400">LATEST CONSENSUS</span>
+            <span className="font-mono text-[10px] tracking-[0.22em] text-[#b1b7c3]">LATEST CONSENSUS</span>
             {consensus.betId !== null && (
-              <span className="rounded border border-slate-200 px-1.5 py-0.5 font-mono text-[9px] tracking-[0.14em] text-slate-500">
+              <span className="rounded border border-[#dee1e7] px-1.5 py-0.5 font-mono text-[9px] tracking-[0.14em] text-[#717886]">
                 #{consensus.betId}
               </span>
             )}
-            <span className="font-mono text-[9px] tracking-[0.14em] text-slate-400">
+            <span className="font-mono text-[9px] tracking-[0.14em] text-[#b1b7c3]">
               {settledAgo < 60 ? `${settledAgo}s ago` : `${Math.floor(settledAgo / 60)}m ago`}
             </span>
           </div>
-          <div className="mt-1 truncate font-mono text-[11px] text-slate-700" title={consensus.question}>
+          <div className="mt-1 truncate font-mono text-[11px] text-[#32353d]" title={consensus.question}>
             {consensus.question}
           </div>
         </div>
@@ -435,11 +415,11 @@ function ConsensusCard({ consensus }: { consensus: LatestConsensus | null }) {
         </div>
       </div>
 
-      <div className="mt-4 flex h-2 w-full overflow-hidden rounded-full bg-slate-200">
-        <div className="bg-[#FF3B5C] transition-all" style={{ width: `${noPct}%` }} />
-        <div className="bg-[#10F3B5] transition-all" style={{ width: `${100 - noPct}%` }} />
+      <div className="mt-4 flex h-2 w-full overflow-hidden rounded-full bg-[#dee1e7]">
+        <div className="bg-[#fc401f] transition-all" style={{ width: `${noPct}%` }} />
+        <div className="bg-[#3c8aff] transition-all" style={{ width: `${100 - noPct}%` }} />
       </div>
-      <div className="mt-2 flex justify-between font-mono text-[10px] tabular-nums text-slate-500">
+      <div className="mt-2 flex justify-between font-mono text-[10px] tabular-nums text-[#717886]">
         <span>NO {consensus.noWeight.toFixed(2)}</span>
         <span>YES {consensus.yesWeight.toFixed(2)}</span>
       </div>
@@ -451,27 +431,27 @@ function ConsensusCard({ consensus }: { consensus: LatestConsensus | null }) {
             className="grid grid-cols-[28px_1fr_54px_40px_80px] items-center gap-2 font-mono text-[11px]"
           >
             <span className="text-lg leading-none">{v.emoji}</span>
-            <span className="truncate text-slate-700 capitalize" title={v.reasoning}>
+            <span className="truncate text-[#32353d] capitalize" title={v.reasoning}>
               {v.dataSource}
             </span>
-            <span className={v.verdict === 'YES' ? 'text-[#10F3B5]' : 'text-[#FF3B5C]'}>
+            <span className={v.verdict === 'YES' ? 'text-[#3c8aff]' : 'text-[#fc401f]'}>
               {v.verdict}
             </span>
-            <span className="text-right tabular-nums text-slate-500">{v.confidence.toFixed(2)}</span>
+            <span className="text-right tabular-nums text-[#717886]">{v.confidence.toFixed(2)}</span>
             <TxLink
               tx={v.verdictTxHash}
-              className="text-right font-mono text-[10px] tabular-nums text-slate-400"
+              className="text-right font-mono text-[10px] tabular-nums text-[#b1b7c3]"
             />
           </div>
         ))}
       </div>
 
-      <div className="mt-4 flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5 font-mono text-[10px] leading-[1.6] text-slate-500">
+      <div className="mt-4 flex items-center justify-between rounded-lg bg-[#eef0f3] px-3 py-2.5 font-mono text-[10px] leading-[1.6] text-[#717886]">
         <span>
           {consensus.totalNanopayments} nanopays · ${consensus.totalSpentUsdc.toFixed(4)} settled
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="text-slate-400">resolve tx</span>
+          <span className="text-[#b1b7c3]">resolve tx</span>
           <TxLink tx={consensus.resolutionTxHash} />
         </span>
       </div>

@@ -81,6 +81,17 @@ export type SwarmAggregate = {
   arcBlock: number
 }
 
+export type EvidenceItem = {
+  id: string
+  text: string
+  url: string
+  author?: string | null
+  source: string
+  timestamp: string
+  /** Circle Gateway transferId for the /evidence call that fetched this item. */
+  txHash?: string | null
+}
+
 export type ConsensusOracleVote = {
   oracleId: string
   dataSource: string
@@ -93,6 +104,11 @@ export type ConsensusOracleVote = {
   evidenceTxHashes: string[]
   reasoning: string
   error?: string
+  summary?: string | null
+  /** ERC-8004 reputation delta the rule applied (+1/-1/-2). */
+  reputationDelta?: number
+  /** Full evidence items pulled from the oracle's /evidence endpoint. */
+  evidence?: EvidenceItem[]
 }
 
 export type LatestConsensus = {
@@ -108,5 +124,6 @@ export type LatestConsensus = {
   resolutionTxHash: string | null
   chainId: number | null
   betId: number | null
+  contractAddress?: string | null
   perOracle: ConsensusOracleVote[]
 }

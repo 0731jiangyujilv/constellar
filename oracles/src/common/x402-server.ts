@@ -1,13 +1,22 @@
-import type { Request, Response, NextFunction } from 'express'
-import { randomBytes } from 'node:crypto'
+import type { Request, Response, NextFunction, RequestHandler } from 'express'
+import { createGatewayMiddleware } from '@circle-fin/x402-batching/server'
 import { config } from './config'
-import { verifyAndSettleLive } from './x402-live'
+import type { OraclePersona } from './types'
 
+/**
+ * Payment context we expose to route handlers. Sourced from Circle Gateway's
+ * middleware (req.payment after successful settle) — each field flows through
+ * to the bot's nanopay registry for UI grouping and status tracking.
+ */
 export type PaymentContext = {
-  txHash: string
-  settledAt: number
-  amountMicroUsdc: bigint
-  payer?: string
+  payer: string
+  amountAtomic: string
+  amountUsdc: number
+  network: string
+  /** Circle transfer id (or batch settlement tx hash once `completed`). */
+  transferId: string | null
+  /** Per-round batch correlation id, threaded by the buyer in `X-Batch-Id`. */
+  batchId: string | null
 }
 
 declare module 'express-serve-static-core' {
@@ -16,85 +25,96 @@ declare module 'express-serve-static-core' {
   }
 }
 
-type Requirement = {
-  amountMicroUsdc: bigint
-  payTo: `0x${string}`
-  resource?: string
-  description?: string
-  personaId?: string
+type GatewayPaymentShape = {
+  verified?: boolean
+  payer?: string
+  amount?: string
+  network?: string
+  transaction?: string
 }
 
-function buildAcceptBody(req: Request, r: Requirement) {
-  return {
-    x402Version: 1,
-    accepts: [
-      {
-        scheme: 'exact',
-        network: config.X402_NETWORK,
-        maxAmountRequired: r.amountMicroUsdc.toString(),
-        asset: config.USDC_ADDRESS,
-        payTo: r.payTo,
-        resource: r.resource ?? req.originalUrl,
-        description: r.description ?? 'Oracle query fee',
-        maxTimeoutSeconds: 30,
-      },
-    ],
-  }
+const DEFAULT_FACILITATOR = 'https://gateway-api-testnet.circle.com'
+const ARC_TESTNET_CAIP2 = 'eip155:5042002'
+
+// One middleware factory per persona — sellerAddress goes directly to the
+// persona's wallet so Gateway routes settled USDC into that oracle's balance.
+function makeGateway(persona: OraclePersona) {
+  const facilitatorUrl =
+    (config.X402_FACILITATOR_URL || DEFAULT_FACILITATOR).replace(/\/$/, '')
+
+  return createGatewayMiddleware({
+    sellerAddress: persona.walletAddress,
+    networks: [ARC_TESTNET_CAIP2],
+    facilitatorUrl,
+    description: `${persona.name} oracle query`,
+  })
 }
 
 /**
- * Decode X-PAYMENT header. In live mode, calls facilitator to verify + settle.
- * In mock mode, short-circuits with a deterministic fake tx hash so dev flows run
- * without real USDC — swap `X402_MODE=live` in env to enable real settlement.
+ * Build a route-level middleware that:
+ *  1. runs Circle Gateway's `require(price)` middleware (handles 402, verifies,
+ *     settles via facilitator; populates res/req with payment info),
+ *  2. normalizes `req.payment` into our `PaymentContext` (pulls `X-Batch-Id`
+ *     from the request headers for batch grouping in the swarm UI).
+ *
+ * `price` must be a Circle-compatible dollar string like `'$0.001'`.
  */
-async function verifyAndSettle(paymentHeader: string, r: Requirement): Promise<PaymentContext> {
-  if (config.X402_MODE === 'mock') {
-    const hash = `0x${randomBytes(32).toString('hex')}`
-    return {
-      txHash: hash,
-      settledAt: Date.now(),
-      amountMicroUsdc: r.amountMicroUsdc,
-      payer: 'mock-payer',
-    }
+export function requirePayment(
+  persona: OraclePersona,
+  price: string,
+): RequestHandler[] {
+  const gateway = makeGateway(persona)
+  const innerMiddleware = gateway.require(price) as unknown as RequestHandler
+
+  // Wrap the gateway middleware so we LOG every non-2xx response body it
+  // writes back. Circle's middleware catches the underlying error.message but
+  // never logs it — so when settle() throws (network blip, bad facilitator,
+  // missing buyer deposit, etc.) the operator sees nothing in the seller log
+  // and the buyer just sees "Payment processing error".
+  const gatewayMiddleware: RequestHandler = (req, res, next) => {
+    const originalEnd = res.end.bind(res)
+    res.end = ((chunk?: any, encoding?: any, cb?: any) => {
+      if (res.statusCode >= 400 && chunk) {
+        try {
+          const text =
+            typeof chunk === 'string'
+              ? chunk
+              : Buffer.isBuffer(chunk)
+                ? chunk.toString('utf8')
+                : String(chunk)
+          if (text) {
+            console.warn(
+              `[${persona.dataSource}] gateway middleware → ${res.statusCode} ${req.method} ${req.url}\n  body: ${text.slice(0, 600)}`,
+            )
+          }
+        } catch {
+          // ignore log shim failures
+        }
+      }
+      return originalEnd(chunk, encoding, cb)
+    }) as typeof res.end
+    return innerMiddleware(req, res, next)
   }
 
-  // Live mode: decode signed EIP-3009 authorization and settle on Arc ourselves.
-  // The oracle is the settlement agent — it pays the (sub-cent) gas with its
-  // own Circle Wallet, so the payer (bot) never has to send a tx.
-  const result = await verifyAndSettleLive(paymentHeader, {
-    amountMicroUsdc: r.amountMicroUsdc,
-    payTo: r.payTo,
-    personaId: r.personaId,
-  })
-  return {
-    txHash: result.txHash,
-    settledAt: Date.now(),
-    amountMicroUsdc: result.amountMicroUsdc,
-    payer: result.payer,
-  }
-}
-
-export function requirePayment(req: Requirement) {
-  return async (request: Request, response: Response, next: NextFunction) => {
-    const header = request.header('X-PAYMENT')
-    if (!header) {
-      response.status(402).json(buildAcceptBody(request, req))
+  const annotate: RequestHandler = (req: Request, _res: Response, next: NextFunction) => {
+    const raw = (req as unknown as { payment?: GatewayPaymentShape }).payment
+    if (!raw) {
+      next()
       return
     }
-
-    try {
-      const ctx = await verifyAndSettle(header, req)
-      request.payment = ctx
-      response.setHeader('X-PAYMENT-RESPONSE', Buffer.from(JSON.stringify({ txHash: ctx.txHash })).toString('base64'))
-      next()
-    } catch (err: any) {
-      const reason = err?.message ?? 'payment verification failed'
-      console.error(`[x402] ${request.method} ${request.originalUrl} verify/settle failed in ${config.X402_MODE} mode: ${reason}`)
-      response.status(402).json({
-        ...buildAcceptBody(request, req),
-        error: reason,
-        mode: config.X402_MODE,
-      })
+    const amountAtomic = raw.amount ?? '0'
+    const amountUsdc = Number(amountAtomic) / 1_000_000
+    const batchHeader = req.header('X-Batch-Id') ?? req.header('x-batch-id')
+    req.payment = {
+      payer: raw.payer ?? 'unknown',
+      amountAtomic,
+      amountUsdc,
+      network: raw.network ?? ARC_TESTNET_CAIP2,
+      transferId: raw.transaction ?? null,
+      batchId: batchHeader ?? null,
     }
+    next()
   }
+
+  return [gatewayMiddleware, annotate]
 }

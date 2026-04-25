@@ -1,37 +1,47 @@
-import { PERSONAS, config } from '@/common/config'
+import { PERSONAS } from '@/common/config'
+import { geminiExtractSearchQuery, geminiGoogleSearch } from '@/common/gemini'
 import { createOracleApp } from '@/common/oracle-app'
-import { makeStubEvidence } from '@/common/stub'
 import type { EvidenceItem } from '@/common/types'
 
+/**
+ * Google oracle — uses Gemini's native `googleSearch` grounding tool to fetch
+ * live web hits for a topic. Each grounding chunk becomes one evidence item.
+ *
+ * The bot passes the full natural-language question as `topic`; we run it
+ * through `geminiExtractSearchQuery` first to distil 3–6 keywords, otherwise
+ * Gemini frequently chooses not to ground long Q&A-style prompts and we get
+ * an empty groundingMetadata.
+ */
 async function fetchFromGoogle(topic: string): Promise<EvidenceItem[]> {
-  if (!config.GOOGLE_CSE_KEY || !config.GOOGLE_CSE_CX) return []
   try {
-    const url = new URL('https://www.googleapis.com/customsearch/v1')
-    url.searchParams.set('key', config.GOOGLE_CSE_KEY)
-    url.searchParams.set('cx', config.GOOGLE_CSE_CX)
-    url.searchParams.set('q', topic)
-    url.searchParams.set('num', '10')
-    url.searchParams.set('dateRestrict', 'd1')
-
-    const res = await fetch(url, { signal: AbortSignal.timeout(4000) })
-    if (!res.ok) return []
-    const json = (await res.json()) as { items?: { title: string; snippet: string; link: string; displayLink: string }[] }
-    return (json.items ?? []).map((it, i) => ({
+    const keywords = await geminiExtractSearchQuery(topic, 'google web search')
+    const prompt = `Search the web for the latest reliable information on: ${keywords}. Cite sources.`
+    const { hits } = await geminiGoogleSearch(prompt)
+    return hits.map((h, i) => ({
       id: `g-${Date.now()}-${i}`,
-      text: `${it.title} — ${it.snippet}`,
-      url: it.link,
-      author: it.displayLink,
+      text: `${h.title} — ${h.snippet}`,
+      url: h.uri,
+      author: safeHost(h.uri),
       timestamp: new Date().toISOString(),
       source: 'google',
     }))
-  } catch {
+  } catch (err: any) {
+    console.warn(`[google] grounded search failed: ${err?.message ?? err}`)
     return []
+  }
+}
+
+function safeHost(uri: string): string {
+  try {
+    return new URL(uri).host
+  } catch {
+    return 'web'
   }
 }
 
 const cache = new Map<string, { items: EvidenceItem[]; idx: number }>()
 
-createOracleApp(PERSONAS.google, async ({ topic, cursor }) => {
+createOracleApp(PERSONAS.google, async ({ topic }) => {
   const key = topic.toLowerCase()
   let state = cache.get(key)
   if (!state || state.idx >= state.items.length) {
@@ -41,6 +51,5 @@ createOracleApp(PERSONAS.google, async ({ topic, cursor }) => {
   }
   const item = state.items[state.idx]
   state.idx += 1
-  if (item) return { ...item, cursor: String(state.idx) }
-  return makeStubEvidence(topic, 'google', cursor)
+  return item ? { ...item, cursor: String(state.idx) } : null
 })

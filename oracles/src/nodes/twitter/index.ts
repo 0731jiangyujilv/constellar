@@ -1,13 +1,14 @@
 import { PERSONAS, config } from '@/common/config'
+import { geminiExtractSearchQuery } from '@/common/gemini'
 import { createOracleApp } from '@/common/oracle-app'
-import { makeStubEvidence } from '@/common/stub'
 import type { EvidenceItem } from '@/common/types'
 
 async function fetchFromX(topic: string): Promise<EvidenceItem[]> {
   if (!config.X_BEARER_TOKEN) return []
   try {
+    const keywords = await geminiExtractSearchQuery(topic, 'twitter recent posts')
     const url = new URL('https://api.x.com/2/tweets/search/recent')
-    url.searchParams.set('query', `${topic} -is:retweet lang:en`)
+    url.searchParams.set('query', `${keywords} -is:retweet lang:en`)
     url.searchParams.set('max_results', '10')
     url.searchParams.set('tweet.fields', 'created_at,author_id')
 
@@ -32,7 +33,7 @@ async function fetchFromX(topic: string): Promise<EvidenceItem[]> {
 
 const cache = new Map<string, { items: EvidenceItem[]; idx: number }>()
 
-createOracleApp(PERSONAS.twitter, async ({ topic, cursor }) => {
+createOracleApp(PERSONAS.twitter, async ({ topic }) => {
   const key = topic.toLowerCase()
   let state = cache.get(key)
   if (!state || state.idx >= state.items.length) {
@@ -42,6 +43,5 @@ createOracleApp(PERSONAS.twitter, async ({ topic, cursor }) => {
   }
   const item = state.items[state.idx]
   state.idx += 1
-  if (item) return { ...item, cursor: String(state.idx) }
-  return makeStubEvidence(topic, 'twitter', cursor)
+  return item ? { ...item, cursor: String(state.idx) } : null
 })

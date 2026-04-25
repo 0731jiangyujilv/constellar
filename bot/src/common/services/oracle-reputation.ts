@@ -46,39 +46,60 @@ function readAgentTokenMap(): AgentTokenMap {
   }
 }
 
+/** Per-oracle delta keyed by `oracle.id` (e.g. `oracle-twitter-01`). */
+export type ReputationDeltas = Record<string, number>
+
+export type ApplyReputationResult = {
+  txHash: string | null
+  skipped?: string
+  /** Deltas for ALL oracles in `perOracle`, regardless of whether they have a
+   *  registered agentTokenId. Useful for UI surfaces that want to show the
+   *  rule's verdict even for unregistered agents. */
+  deltas: ReputationDeltas
+}
+
+function computeDelta(r: PerOracleResult, finalOutcome: "YES" | "NO"): number {
+  if (r.error) return -2
+  if (r.verdict === finalOutcome) return 1
+  return -1
+}
+
 export async function applySwarmReputation(params: {
   eventKey: string
   finalOutcome: "YES" | "NO"
   perOracle: PerOracleResult[]
-}): Promise<{ txHash: string | null; skipped?: string }> {
+}): Promise<ApplyReputationResult> {
+  // Compute deltas up-front for EVERY oracle so the UI can show what the rule
+  // applied even when on-chain submission is skipped.
+  const deltas: ReputationDeltas = {}
+  for (const r of params.perOracle) {
+    deltas[r.oracle.id] = computeDelta(r, params.finalOutcome)
+  }
+
   const registry = process.env.ORACLE_REGISTRY_ADDRESS as `0x${string}` | undefined
   if (!registry || !/^0x[0-9a-fA-F]{40}$/.test(registry)) {
-    return { txHash: null, skipped: "ORACLE_REGISTRY_ADDRESS not set" }
+    return { txHash: null, skipped: "ORACLE_REGISTRY_ADDRESS not set", deltas }
   }
 
   const chainId = Number(process.env.REPUTATION_CHAIN_ID ?? 0)
-  if (!chainId) return { txHash: null, skipped: "REPUTATION_CHAIN_ID not set" }
+  if (!chainId) return { txHash: null, skipped: "REPUTATION_CHAIN_ID not set", deltas }
 
   const publicClient = getPublicClient(chainId)
   const walletClient = getWalletClient(chainId)
-  if (!walletClient) return { txHash: null, skipped: "bot wallet unavailable for chain" }
+  if (!walletClient) return { txHash: null, skipped: "bot wallet unavailable for chain", deltas }
 
   const tokenMap = readAgentTokenMap()
   const tokenIds: bigint[] = []
-  const deltas: bigint[] = []
+  const onChainDeltas: bigint[] = []
 
   for (const r of params.perOracle) {
     const id = tokenMap[r.oracle.id]
     if (!id) continue
-    let delta: bigint
-    if (r.error) delta = -2n
-    else if (r.verdict === params.finalOutcome) delta = 1n
-    else delta = -1n
     tokenIds.push(BigInt(id))
-    deltas.push(delta)
+    onChainDeltas.push(BigInt(deltas[r.oracle.id]))
   }
 
-  if (tokenIds.length === 0) return { txHash: null, skipped: "no registered agents" }
+  if (tokenIds.length === 0) return { txHash: null, skipped: "no registered agents", deltas }
 
   const eventKey = keccak256(toBytes(params.eventKey)) as `0x${string}`
   const reason = `swarm-resolve:${params.finalOutcome}`
@@ -88,15 +109,15 @@ export async function applySwarmReputation(params: {
       address: registry,
       abi: ORACLE_REGISTRY_ABI,
       functionName: "applyOutcome",
-      args: [eventKey, tokenIds, deltas, reason],
+      args: [eventKey, tokenIds, onChainDeltas, reason],
       account: walletClient.account!,
     })
     const txHash = await walletClient.writeContract(request)
     console.log(`🏷️  applyOutcome tx=${txHash} agents=${tokenIds.length} eventKey=${eventKey.slice(0, 14)}…`)
-    return { txHash }
+    return { txHash, deltas }
   } catch (err: any) {
     console.error(`🏷️  applyOutcome failed: ${err?.shortMessage ?? err?.message}`)
-    return { txHash: null, skipped: `tx error: ${err?.shortMessage ?? err?.message}` }
+    return { txHash: null, skipped: `tx error: ${err?.shortMessage ?? err?.message}`, deltas }
   }
 }
 

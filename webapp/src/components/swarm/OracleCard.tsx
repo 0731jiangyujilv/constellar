@@ -13,21 +13,21 @@ type Props = {
 const STATUS_META: Record<OracleNode['status'], { label: string; dot: string; ring: string; text: string }> = {
   healthy: {
     label: 'LIVE',
-    dot: 'bg-[#10F3B5]',
-    ring: 'ring-[#10F3B5]/30 border-[#10F3B5]/25 shadow-[0_0_16px_-6px_rgba(16,243,181,0.20)]',
-    text: 'text-[#10F3B5]',
+    dot: 'bg-[#3c8aff]',
+    ring: 'ring-[#3c8aff]/30 border-[#3c8aff]/30 shadow-[0_0_16px_-6px_rgba(60,138,255,0.25)]',
+    text: 'text-[#3c8aff]',
   },
   degraded: {
     label: 'SLOW',
-    dot: 'bg-[#FFC44D]',
-    ring: 'ring-[#FFC44D]/30 border-[#FFC44D]/25 shadow-[0_0_16px_-6px_rgba(255,196,77,0.20)]',
-    text: 'text-[#FFC44D]',
+    dot: 'bg-[#ffd12f]',
+    ring: 'ring-[#ffd12f]/30 border-[#ffd12f]/30 shadow-[0_0_16px_-6px_rgba(255,209,47,0.25)]',
+    text: 'text-[#5b616e]',
   },
   offline: {
     label: 'OFFLINE',
-    dot: 'bg-[#FF3B5C]',
-    ring: 'ring-[#FF3B5C]/30 border-[#FF3B5C]/30 shadow-[0_0_16px_-6px_rgba(255,59,92,0.20)]',
-    text: 'text-[#FF3B5C]',
+    dot: 'bg-[#fc401f]',
+    ring: 'ring-[#fc401f]/30 border-[#fc401f]/30 shadow-[0_0_16px_-6px_rgba(252,64,31,0.25)]',
+    text: 'text-[#fc401f]',
   },
 }
 
@@ -93,7 +93,7 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
 
   const status = STATUS_META[node.status]
   const offline = node.status === 'offline'
-  const accent = node.status === 'healthy' ? '#10F3B5' : node.status === 'degraded' ? '#FFC44D' : '#FF3B5C'
+  const accent = node.status === 'healthy' ? '#3c8aff' : node.status === 'degraded' ? '#ffd12f' : '#fc401f'
 
   return (
     <div
@@ -105,7 +105,7 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
       {pulse && !offline && (
         <span
           key={pulseKey}
-          className="pointer-events-none absolute -inset-px rounded-2xl ring-2 ring-[#10F3B5]/60 animate-[card-pulse_1.1s_ease-out]"
+          className="pointer-events-none absolute -inset-px rounded-2xl ring-2 ring-[#3c8aff]/60 animate-[card-pulse_1.1s_ease-out]"
         />
       )}
 
@@ -113,14 +113,14 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-xl bg-slate-50 text-2xl ring-1 ring-slate-200">
+            <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#eef0f3] text-2xl ring-1 ring-[#dee1e7]">
               <span style={{ filter: offline ? 'grayscale(1) opacity(0.4)' : 'none' }}>{node.emoji}</span>
             </div>
             <div className="min-w-0">
-              <div className="font-mono text-[11px] font-semibold tracking-[0.18em] text-slate-900">
+              <div className="font-mono text-[11px] font-semibold tracking-[0.18em] text-[#0a0b0d]">
                 {node.name.toUpperCase()}
               </div>
-              <div className="mt-0.5 font-mono text-[10px] text-slate-500">{node.id}</div>
+              <div className="mt-0.5 font-mono text-[10px] text-[#717886]">{node.id}</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -129,7 +129,7 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
           </div>
         </div>
 
-        <div className="mt-1.5 font-mono text-[10.5px] tracking-wide text-slate-500">{node.tagline}</div>
+        <div className="mt-1.5 font-mono text-[10.5px] tracking-wide text-[#717886]">{node.tagline}</div>
 
         {/* ERC-8004 identity + reputation badge */}
         {(node.agentTokenId || typeof node.reputation === 'number') && (
@@ -142,8 +142,8 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
                   {...(registryLink
                     ? { href: registryLink, target: '_blank', rel: 'noopener noreferrer', title: 'OracleRegistry on Arc' }
                     : {})}
-                  className={`rounded-sm border border-[#0052ff]/25 bg-[#0052ff]/5 px-1.5 py-0.5 text-[#0052ff] ${
-                    registryLink ? 'transition hover:border-[#0052ff]/60 hover:bg-[#0052ff]/20' : ''
+                  className={`rounded-sm border border-[#0000ff]/25 bg-[#0000ff]/5 px-1.5 py-0.5 text-[#0000ff] ${
+                    registryLink ? 'transition hover:border-[#0000ff]/60 hover:bg-[#0000ff]/20' : ''
                   }`}
                 >
                   ERC-8004
@@ -155,7 +155,7 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
                 const readLink = arcContractReadLink(node.registryAddress)
                 const inner = (
                   <>
-                    ID <span className="tabular-nums text-slate-700">#{node.agentTokenId}</span>
+                    ID <span className="tabular-nums text-[#32353d]">#{node.agentTokenId}</span>
                   </>
                 )
                 return readLink ? (
@@ -164,26 +164,26 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     title={`read agents(${node.agentTokenId}) on Arc`}
-                    className="text-slate-500 transition hover:text-slate-700"
+                    className="text-[#717886] transition hover:text-[#32353d]"
                   >
                     {inner}
                   </a>
                 ) : (
-                  <span className="text-slate-500">{inner}</span>
+                  <span className="text-[#717886]">{inner}</span>
                 )
               })()
             ) : (
-              <span className="text-slate-400">unregistered</span>
+              <span className="text-[#b1b7c3]">unregistered</span>
             )}
             {typeof node.reputation === 'number' && (
               (() => {
                 const readLink = arcContractReadLink(node.registryAddress)
                 const repColor =
                   node.reputation > 0
-                    ? 'text-[#10F3B5]'
+                    ? 'text-[#66c800]'
                     : node.reputation < 0
-                      ? 'text-[#FF3B5C]'
-                      : 'text-slate-700'
+                      ? 'text-[#fc401f]'
+                      : 'text-[#32353d]'
                 const inner = (
                   <>
                     REP{' '}
@@ -199,25 +199,25 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     title={`read reputation(${node.agentTokenId ?? '…'}) on Arc`}
-                    className="text-slate-500 transition hover:text-slate-700"
+                    className="text-[#32353d] transition hover:text-[#0a0b0d]"
                   >
                     {inner}
                   </a>
                 ) : (
-                  <span className="text-slate-500">{inner}</span>
+                  <span className="text-[#32353d]">{inner}</span>
                 )
               })()
             )}
           </div>
         )}
 
-        <div className="mt-5 h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+        <div className="mt-5 h-px w-full bg-gradient-to-r from-transparent via-[#dee1e7] to-transparent" />
 
         {/* Latency sparkline */}
         <div className="mt-4">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] tracking-[0.14em] text-slate-400">LATENCY · ms</span>
-            <span className={`font-mono text-[11px] tabular-nums ${offline ? 'text-slate-400' : 'text-slate-700'}`}>
+            <span className="font-mono text-[10px] tracking-[0.14em] text-[#b1b7c3]">LATENCY · ms</span>
+            <span className={`font-mono text-[11px] tabular-nums ${offline ? 'text-[#b1b7c3]' : 'text-[#32353d]'}`}>
               {offline ? '—' : `${Math.round(node.selfLatencyMs)}`}
             </span>
           </div>
@@ -229,27 +229,27 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
         {/* Earnings & metrics grid */}
         <div className="mt-5 grid grid-cols-2 gap-x-5 gap-y-3">
           <div>
-            <div className="font-mono text-[10px] tracking-[0.14em] text-slate-400">EARNINGS · 24H</div>
-            <div className={`mt-1 font-mono text-[15px] font-semibold tabular-nums ${offline ? 'text-slate-400' : 'text-slate-900'}`}>
+            <div className="font-mono text-[10px] tracking-[0.14em] text-[#b1b7c3]">EARNINGS · 24H</div>
+            <div className={`mt-1 font-mono text-[15px] font-semibold tabular-nums ${offline ? 'text-[#b1b7c3]' : 'text-[#0a0b0d]'}`}>
               ${node.earnings24hUsdc.toFixed(5)}
-              <span className="ml-1 text-[10px] text-slate-500">USDC</span>
+              <span className="ml-1 text-[10px] text-[#b1b7c3]">USDC</span>
             </div>
           </div>
           <div>
-            <div className="font-mono text-[10px] tracking-[0.14em] text-slate-400">BALANCE</div>
-            <div className={`mt-1 font-mono text-[15px] font-semibold tabular-nums ${offline ? 'text-slate-400' : 'text-slate-700'}`}>
+            <div className="font-mono text-[10px] tracking-[0.14em] text-[#b1b7c3]">BALANCE</div>
+            <div className={`mt-1 font-mono text-[15px] font-semibold tabular-nums ${offline ? 'text-[#b1b7c3]' : 'text-[#32353d]'}`}>
               ${node.walletBalanceUsdc.toFixed(4)}
             </div>
           </div>
           <div>
-            <div className="font-mono text-[10px] tracking-[0.14em] text-slate-400">QUERIES · 1H</div>
-            <div className={`mt-1 font-mono text-[15px] font-semibold tabular-nums ${offline ? 'text-slate-400' : 'text-slate-900'}`}>
+            <div className="font-mono text-[10px] tracking-[0.14em] text-[#b1b7c3]">QUERIES · 1H</div>
+            <div className={`mt-1 font-mono text-[15px] font-semibold tabular-nums ${offline ? 'text-[#b1b7c3]' : 'text-[#0a0b0d]'}`}>
               {node.queries1h}
             </div>
           </div>
           <div>
-            <div className="font-mono text-[10px] tracking-[0.14em] text-slate-400">EVIDENCE · 24H</div>
-            <div className={`mt-1 font-mono text-[15px] font-semibold tabular-nums ${offline ? 'text-slate-400' : 'text-slate-900'}`}>
+            <div className="font-mono text-[10px] tracking-[0.14em] text-[#b1b7c3]">EVIDENCE · 24H</div>
+            <div className={`mt-1 font-mono text-[15px] font-semibold tabular-nums ${offline ? 'text-[#b1b7c3]' : 'text-[#0a0b0d]'}`}>
               {node.evidenceServed24h.toLocaleString()}
             </div>
           </div>
@@ -259,33 +259,33 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
           <AccuracyBar value={node.accuracy} offline={offline} />
         </div>
 
-        <div className="mt-5 h-px w-full bg-slate-100" />
+        <div className="mt-5 h-px w-full bg-[#eef0f3]" />
 
         {/* Footer */}
         <div className="mt-3 flex items-center justify-between font-mono text-[10px]">
-          <div className="flex items-center gap-1.5 text-slate-500">
-            <span className={`inline-block h-1 w-1 rounded-full ${offline ? 'bg-slate-300' : 'bg-[#10F3B5]'}`} />
+          <div className="flex items-center gap-1.5 text-[#b1b7c3]">
+            <span className={`inline-block h-1 w-1 rounded-full ${offline ? 'bg-[#b1b7c3]' : 'bg-[#3c8aff]'}`} />
             <span>uptime</span>
-            <span className={`tabular-nums ${offline ? 'text-slate-400' : 'text-slate-700'}`}>
+            <span className={`tabular-nums ${offline ? 'text-[#b1b7c3]' : 'text-[#32353d]'}`}>
               {fmtUptime(node.uptimeSec)}
             </span>
           </div>
           <a
             href="#"
             onClick={(e) => e.preventDefault()}
-            className="flex items-center gap-1.5 text-slate-500 transition hover:text-slate-700"
+            className="flex items-center gap-1.5 text-[#b1b7c3] transition hover:text-[#32353d]"
             title={node.walletAddress}
           >
             <span>wallet</span>
-            <span className={`tabular-nums ${offline ? 'text-slate-400' : 'text-slate-700'}`}>
+            <span className={`tabular-nums ${offline ? 'text-[#b1b7c3]' : 'text-[#32353d]'}`}>
               {fmtAddr(node.walletAddress)}
             </span>
           </a>
         </div>
 
-        <div className="mt-2 flex items-center justify-between font-mono text-[10px] text-slate-400">
+        <div className="mt-2 flex items-center justify-between font-mono text-[10px] text-[#b1b7c3]">
           <div className="flex items-center gap-1.5">
-            <span className="inline-block h-1 w-1 rounded-full bg-[#0052ff] animate-pulse" />
+            <span className="inline-block h-1 w-1 rounded-full bg-[#0000ff] animate-pulse" />
             <span>heartbeat</span>
             <HeartbeatAgo ts={node.lastHeartbeatAt} />
             <span>ago</span>
@@ -299,8 +299,8 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
             title={`copy: pm2 ${killed ? 'restart' : 'stop'} ${node.id}`}
             className={`group cursor-pointer rounded px-2 py-0.5 font-mono text-[9px] tracking-[0.15em] transition ${
               killed
-                ? 'bg-[#10F3B5]/15 text-[#10F3B5] hover:bg-[#10F3B5]/25'
-                : 'bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-700'
+                ? 'bg-[#3c8aff]/15 text-[#3c8aff] hover:bg-[#3c8aff]/25'
+                : 'bg-[#eef0f3] text-[#717886] hover:bg-[#dee1e7] hover:text-[#32353d]'
             }`}
           >
             {killed ? '◉ COPY pm2 restart' : '◌ COPY pm2 stop'}

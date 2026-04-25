@@ -35,6 +35,17 @@ export type NanopayUpdate = {
   transferId?: string | null
 }
 
+export type EvidenceItemPayload = {
+  id: string
+  text: string
+  url: string
+  author?: string | null
+  source: string
+  timestamp: string
+  /** Circle Gateway transferId for the /evidence call that fetched this item. */
+  txHash?: string | null
+}
+
 export type ConsensusOracleVote = {
   oracleId: string
   dataSource: string
@@ -47,6 +58,12 @@ export type ConsensusOracleVote = {
   evidenceTxHashes: string[]
   reasoning: string
   error?: string
+  /** Per-oracle Gemini summary text. Null when summarize call failed/was skipped. */
+  summary?: string | null
+  /** ERC-8004 reputation delta the rule applied for this oracle (+1/-1/-2). */
+  reputationDelta?: number
+  /** Full evidence items returned by this oracle's /evidence calls. */
+  evidence?: EvidenceItemPayload[]
 }
 
 export type LatestConsensus = {
@@ -62,6 +79,7 @@ export type LatestConsensus = {
   resolutionTxHash: string | null
   chainId: number | null
   betId: number | null
+  contractAddress: string | null
   perOracle: ConsensusOracleVote[]
 }
 
@@ -203,27 +221,62 @@ export function updateNanopay(update: NanopayUpdate) {
     })
 }
 
-export function recordConsensus(c: Omit<LatestConsensus, "ts"> & { ts?: number }) {
-  latestConsensus = { ...c, ts: c.ts ?? Date.now() }
+export function recordConsensus(
+  c: Omit<LatestConsensus, "ts" | "contractAddress"> & {
+    ts?: number
+    contractAddress?: string | null
+  },
+) {
+  const contractAddress = c.contractAddress ? c.contractAddress.toLowerCase() : null
+  latestConsensus = {
+    ...c,
+    ts: c.ts ?? Date.now(),
+    contractAddress,
+  }
   broadcast("consensus", latestConsensus)
 
-  prisma.swarmConsensus
-    .create({
-      data: {
-        ts: new Date(latestConsensus.ts),
-        chainId: latestConsensus.chainId ?? null,
-        betId: latestConsensus.betId ?? null,
-        question: latestConsensus.question,
-        topic: latestConsensus.topic,
-        outcome: latestConsensus.outcome,
-        spread: latestConsensus.spread,
-        yesWeight: latestConsensus.yesWeight,
-        noWeight: latestConsensus.noWeight,
-        totalNanopayments: latestConsensus.totalNanopayments,
-        totalSpentUsdc: new Prisma.Decimal(latestConsensus.totalSpentUsdc),
-        resolutionTxHash: latestConsensus.resolutionTxHash,
-        perOracle: latestConsensus.perOracle as unknown as Prisma.InputJsonValue,
-      },
+  // Persist consensus row + per-evidence rows atomically: a partial write would
+  // leave a consensus with no evidence (or vice versa) and confuse the reader.
+  const consensusData = {
+    ts: new Date(latestConsensus.ts),
+    chainId: latestConsensus.chainId ?? null,
+    betId: latestConsensus.betId ?? null,
+    contractAddress,
+    question: latestConsensus.question,
+    topic: latestConsensus.topic,
+    outcome: latestConsensus.outcome,
+    spread: latestConsensus.spread,
+    yesWeight: latestConsensus.yesWeight,
+    noWeight: latestConsensus.noWeight,
+    totalNanopayments: latestConsensus.totalNanopayments,
+    totalSpentUsdc: new Prisma.Decimal(latestConsensus.totalSpentUsdc),
+    resolutionTxHash: latestConsensus.resolutionTxHash,
+    perOracle: latestConsensus.perOracle as unknown as Prisma.InputJsonValue,
+  }
+
+  prisma
+    .$transaction(async (tx) => {
+      const created = await tx.swarmConsensus.create({ data: consensusData })
+
+      const evidenceRows: Prisma.SwarmEvidenceCreateManyInput[] = []
+      for (const o of latestConsensus!.perOracle) {
+        for (const e of o.evidence ?? []) {
+          evidenceRows.push({
+            consensusId: created.id,
+            oracleId: o.oracleId,
+            externalId: e.id,
+            text: e.text,
+            url: e.url,
+            author: e.author ?? null,
+            source: e.source,
+            timestamp: e.timestamp,
+            txHash: e.txHash ?? null,
+          })
+        }
+      }
+      if (evidenceRows.length > 0) {
+        await tx.swarmEvidence.createMany({ data: evidenceRows })
+      }
     })
     .catch((err) => {
       console.warn("[swarm-registry] consensus persist failed:", err?.message ?? err)
@@ -239,7 +292,10 @@ export async function hydrateFromDb() {
   try {
     const [events, consensus, total] = await Promise.all([
       prisma.swarmNanopay.findMany({ orderBy: { ts: "desc" }, take: EVENTS_RING }),
-      prisma.swarmConsensus.findFirst({ orderBy: { ts: "desc" } }),
+      prisma.swarmConsensus.findFirst({
+        orderBy: { ts: "desc" },
+        include: { evidence: true },
+      }),
       prisma.swarmNanopay.count(),
     ])
 
@@ -269,10 +325,37 @@ export async function hydrateFromDb() {
     totalNanoPayments = total
 
     if (consensus) {
+      // Merge relational evidence rows back into the perOracle JSON so cached
+      // readers see the same shape as a fresh recordConsensus payload.
+      const evidenceByOracle = new Map<string, EvidenceItemPayload[]>()
+      for (const e of consensus.evidence) {
+        const list = evidenceByOracle.get(e.oracleId) ?? []
+        list.push({
+          id: e.externalId,
+          text: e.text,
+          url: e.url,
+          author: e.author,
+          source: e.source,
+          timestamp: e.timestamp,
+          txHash: e.txHash,
+        })
+        evidenceByOracle.set(e.oracleId, list)
+      }
+
+      const perOracleRaw = (consensus.perOracle as unknown as ConsensusOracleVote[]) ?? []
+      const perOracle: ConsensusOracleVote[] = perOracleRaw.map((o) => {
+        const fromDb = evidenceByOracle.get(o.oracleId) ?? []
+        return {
+          ...o,
+          evidence: fromDb.length > 0 ? fromDb : (o.evidence ?? []),
+        }
+      })
+
       latestConsensus = {
         ts: consensus.ts.getTime(),
         chainId: consensus.chainId,
         betId: consensus.betId,
+        contractAddress: consensus.contractAddress ?? null,
         question: consensus.question,
         topic: consensus.topic,
         outcome: consensus.outcome as LatestConsensus["outcome"],
@@ -282,7 +365,7 @@ export async function hydrateFromDb() {
         totalNanopayments: consensus.totalNanopayments,
         totalSpentUsdc: Number(consensus.totalSpentUsdc),
         resolutionTxHash: consensus.resolutionTxHash,
-        perOracle: consensus.perOracle as unknown as LatestConsensus["perOracle"],
+        perOracle,
       }
     }
 

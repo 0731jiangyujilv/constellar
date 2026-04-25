@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { parseUnits } from 'viem'
 import { useAccount, useChainId, usePublicClient, useReadContract, useReadContracts } from 'wagmi'
 import { useWriteContractWithAttribution } from '@/hooks/useWriteContractWithAttribution'
@@ -56,6 +56,7 @@ export function EventMarketPage() {
     functionName: 'resolutionSource',
     chainId: betChainId,
   })
+  console.log(resolutionSource)
 
   const { data: positionData, refetch: refetchPositions } = useReadContracts({
     contracts: [
@@ -333,12 +334,12 @@ export function EventMarketPage() {
                 <p className="text-xs uppercase tracking-[0.28em] text-[var(--color-muted)]">Market Info</p>
                 <div className="mt-4 rounded-2xl border border-[rgba(20,20,20,0.08)] bg-[rgba(255,255,255,0.8)] p-4 text-sm space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-[var(--color-muted)]">Question</span>
+                    <span className="text-[var(--color-muted)]">Title</span>
                     <span className="font-medium text-[var(--color-ink)] text-right max-w-[60%]">{question || '...'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[var(--color-muted)]">Data Source</span>
-                    <span className="font-medium text-[var(--color-ink)] text-right max-w-[60%]">{resolutionSource || '...'}</span>
+                    <span className="font-medium text-[var(--color-ink)] text-right max-w-[60%]">Constellar</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[var(--color-muted)]">Status</span>
@@ -353,13 +354,14 @@ export function EventMarketPage() {
                   {isSettled && (
                     <div className="flex justify-between">
                       <span className="text-[var(--color-muted)]">Result</span>
-                      <span className={`font-semibold ${betInfo.isDraw ? 'text-[var(--color-cyan)]' : 'text-[#86efac]'}`}>
+                      <span className={`font-semibold ${betInfo.isDraw ? 'text-[var(--color-cyan)]' : 'text-[#3c8aff]'}`}>
                         {betInfo.isDraw
                           ? 'Draw'
                           : `${betInfo.outcome === 1 ? 'YES' : 'NO'} wins 👑`}
                       </span>
                     </div>
                   )}
+                  
                   <div className="flex justify-between">
                     <span className="text-[var(--color-muted)]">Participants</span>
                     <span className="font-medium text-[var(--color-ink)]">{totalPlayers}</span>
@@ -369,6 +371,18 @@ export function EventMarketPage() {
                     <span className="font-medium text-[var(--color-ink)]">{chainConfig?.chain?.name || `Chain ${betChainId}`}</span>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {isSettled && (
+              <div className="pt-2">
+                <Link
+                  to={`/event/${contractAddress}/oracles?chainId=${betChainId}`}
+                  className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-cyan)] hover:underline rounded-full border border-[rgba(20,20,20,0.14)] bg-white px-4 py-3 text-center text-sm font-semibold text-[var(--color-ink)] shadow-[0_4px_12px_rgba(20,20,20,0.1)]"
+                >
+                  Powered by Constellar
+                  <span aria-hidden>→</span>
+                </Link>
               </div>
             )}
 
@@ -579,11 +593,11 @@ function MetricCard({
     green: 'bg-[rgba(0,0,255,0.05)] text-[var(--color-cyan)]',
   }
   const highlightedCardMap = {
-    cyan: 'border-[rgba(34,197,94,0.45)] bg-[rgba(34,197,94,0.08)] ring-2 ring-[rgba(34,197,94,0.28)]',
-    magenta: 'border-[rgba(34,197,94,0.45)] bg-[rgba(34,197,94,0.08)] ring-2 ring-[rgba(34,197,94,0.28)]',
-    green: 'border-[rgba(34,197,94,0.45)] bg-[rgba(34,197,94,0.08)] ring-2 ring-[rgba(34,197,94,0.28)]',
+    cyan: 'border-[rgba(60,138,255,0.45)] bg-[rgba(60,138,255,0.08)] ring-2 ring-[rgba(60,138,255,0.28)]',
+    magenta: 'border-[rgba(60,138,255,0.45)] bg-[rgba(60,138,255,0.08)] ring-2 ring-[rgba(60,138,255,0.28)]',
+    green: 'border-[rgba(60,138,255,0.45)] bg-[rgba(60,138,255,0.08)] ring-2 ring-[rgba(60,138,255,0.28)]',
   }
-  const valueClass = highlighted ? 'bg-[rgba(134,239,172,0.14)] text-[#16a34a]' : accentMap[accent]
+  const valueClass = highlighted ? 'bg-[rgba(60,138,255,0.12)] text-[#3c8aff]' : accentMap[accent]
   const cardClass = highlighted
     ? `rounded-2xl border p-4 transition ${highlightedCardMap[accent]}`
     : 'rounded-2xl border border-[rgba(20,20,20,0.08)] bg-[rgba(255,255,255,0.8)] p-4 transition'
@@ -591,7 +605,7 @@ function MetricCard({
   return (
     <div className={`relative ${cardClass}`}>
       {winnerStamp && (
-        <span className="absolute right-3 bottom-3 flex h-9 w-9 rotate-[-12deg] items-center justify-center rounded-full border-[1.5px] border-[rgba(238,39,55,0.55)] bg-[rgba(238,39,55,0.08)] text-[8px] font-extrabold tracking-[0.18em] text-[rgba(238,39,55,0.9)]">
+        <span className="absolute right-3 bottom-3 flex h-9 w-9 rotate-[-12deg] items-center justify-center rounded-full border-[1.5px] border-[rgba(60,138,255,0.55)] bg-[rgba(60,138,255,0.08)] text-[8px] font-extrabold tracking-[0.18em] text-[#3c8aff]">
           {winnerStamp}
         </span>
       )}

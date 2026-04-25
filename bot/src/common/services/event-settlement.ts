@@ -232,6 +232,7 @@ async function executeResolve(params: {
       let swarmResult: Awaited<ReturnType<typeof resolveWithSwarm>> | null = null
       let swarmTopic: string | null = null
 
+      let reputationDeltas: Record<string, number> = {}
       if (forceSwarm || USE_SWARM) {
         const topic = (dataSourceConfig?.topic as string | undefined) ?? contractQuestion
         console.log(`🧠 EventBet #${params.betId}: resolving via 5-oracle swarm — topic="${topic.slice(0, 60)}"`)
@@ -245,9 +246,16 @@ async function executeResolve(params: {
             `via ${swarm.totalNanopayments} nanopays ($${swarm.totalSpentUsdc.toFixed(4)})`,
         )
 
-        // ERC-8004 reputation update (no-op if registry env not configured)
+        // ERC-8004 reputation update (no-op if registry env not configured).
+        // Awaited so we can capture per-oracle deltas for the consensus payload —
+        // even when on-chain write is skipped, the rule-derived deltas come back.
         const eventKey = deriveEventKey(params.contractAddress, params.betId)
-        void applySwarmReputation({ eventKey, finalOutcome: outcome, perOracle: swarm.perOracle })
+        const repResult = await applySwarmReputation({
+          eventKey,
+          finalOutcome: outcome,
+          perOracle: swarm.perOracle,
+        })
+        reputationDeltas = repResult.deltas
       } else {
         const capability = getCapability(dataSourceType)
         if (!capability) {
@@ -306,6 +314,7 @@ async function executeResolve(params: {
           resolutionTxHash: tx,
           chainId: params.chainId,
           betId: params.betId,
+          contractAddress: params.contractAddress.toLowerCase(),
           perOracle: swarmResult.perOracle.map((r) => ({
             oracleId: r.oracle.id,
             dataSource: r.oracle.dataSource,
@@ -318,6 +327,17 @@ async function executeResolve(params: {
             evidenceTxHashes: r.evidenceTxHashes,
             reasoning: r.reasoning,
             error: r.error,
+            summary: r.summary,
+            reputationDelta: reputationDeltas[r.oracle.id] ?? 0,
+            evidence: r.evidence.map((e, idx) => ({
+              id: e.id,
+              text: e.text,
+              url: e.url,
+              author: e.author,
+              source: e.source,
+              timestamp: e.timestamp,
+              txHash: r.evidenceTxHashes[idx] ?? null,
+            })),
           })),
         }
         try {
