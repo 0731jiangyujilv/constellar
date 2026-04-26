@@ -2,7 +2,17 @@
 
 **Coordinated intelligence for programmable judgment.**
 
-Constellar resolves real-world event markets with a swarm of LLM-powered oracles. Each oracle call is paid at the HTTP layer via **x402** nanopayments, and settlement is moved off the per-call critical path by **Circle Gateway**: the bot deposits USDC once into a Gateway Wallet, signs EIP-3009 authorizations per call, and the Gateway facilitator verifies signatures in an AWS Nitro TEE, nets them, and settles on-chain in batches. Oracle nodes no longer need chain transaction keys at all.
+Constellar is a multi-agent oracle network built for verifiable judgment in the agentic economy. As AI agents begin to participate in economic workflows, judgment itself needs infrastructure: something accurate, payable, and onchain.
+
+Constellar coordinates specialized AI agents as oracle nodes. Different agents retrieve evidence, interpret resolution criteria, challenge ambiguity, and produce a final structured outcome. Instead of relying on one opaque oracle answer, Constellar creates a judgment pipeline that is modular, auditable, and easier to verify. The system can be used across many scenarios, including e-commerce disputes, governance execution, service or delivery arbitration, and prediction market settlement.
+
+For this demo, we focus on the prediction market use case through an integration with PolyPop (X@_PolyPOP), an Arc-native prediction market that turns X claims into live bets, while Constellar produces the settlement outcome.
+
+Gemini is the intelligence layer behind Constellar. It helps improve factual accuracy, reduce hallucinations through grounded search, access real-time web evidence, and return citations for verification. Arc and Circle Nanopayments make this model economically viable: AI agents can operate as oracle nodes through small paid tasks such as evidence retrieval, verification, API calls, and decision steps, while final outcomes settle in USDC on Arc and remain fully onchain, traceable, and verifiable.
+
+Powered by Circle Nanopayments, Gemini, and Arc Chain.
+
+Live demo: https://x.com/_1_jade_/status/2048165859152269597?s=20
 
 ---
 
