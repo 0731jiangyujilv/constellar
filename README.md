@@ -45,21 +45,66 @@ The `event-settlement` cron resolves an `EventBet` in five stages:
 
 ---
 
-## Repository Layout
+## Key Repository Layout
 
-```
+<pre>
 constellar/
-├── contracts/   # Foundry project — EventBet, OracleRegistry, BetFactory, PriceOracleFactory
-├── oracles/     # 5-node PM2 Express swarm (twitter/google/news/reddit/youtube) + oracle middleware
-├── webapp/      # React + Vite frontend with wagmi + SIWE and live SSE consensus stream
-└── images/      # Architecture diagrams (source of truth for this README)
-```
+├── <a href="contracts/">contracts/</a>                          # Foundry project
+│   │   ├── <a href="contracts/src/OracleRegistry.sol">OracleRegistry.sol</a>          # Arc-native oracle reputation + outcome tracking
+│   └── <a href="contracts/script/">script/</a>
+│       └── <a href="contracts/script/DeployOracleRegistry.s.sol">DeployOracleRegistry.s.sol</a>
+│
+├── <a href="oracles/">oracles/</a>                            # 5-node PM2 Express swarm
+│   └── <a href="oracles/src/">src/</a>
+│       └── <a href="oracles/src/nodes/">nodes/</a>
+│           ├── <a href="oracles/src/nodes/twitter/">twitter/</a>                # X API v2 evidence oracle  (:4001)
+│           ├── <a href="oracles/src/nodes/google/">google/</a>                 # Google CSE evidence oracle (:4002)
+│           ├── <a href="oracles/src/nodes/news/">news/</a>                   # GDELT 2.0 news oracle      (:4003)
+│           ├── <a href="oracles/src/nodes/reddit/">reddit/</a>                 # Reddit evidence oracle     (:4004)
+│           └── <a href="oracles/src/nodes/youtube/">youtube/</a>                # YouTube evidence oracle    (:4005)
+│
+├── <a href="bot/">bot/</a>                                # Node.js + Express + Prisma backend (PM2)
+│   └── <a href="bot/src/">src/</a>
+│       ├── <a href="bot/src/common/">common/</a>
+│       │   ├── <a href="bot/src/common/middleware/">middleware/</a>             # Auth / rate-limit middleware
+│       │       ├── <a href="bot/src/common/services/x402-client.ts">x402-client.ts</a>      # GatewayClient.pay() — EIP-3009 + Circle Gateway wallet
+│       ├── <a href="bot/src/event-settlement-worker.ts">event-settlement-worker.ts</a>  # PM2 cron entry — leases + resolves pending EventBets
+│       ├── <a href="bot/src/tg/">tg/</a>                         # Telegram bot
+│       └── <a href="bot/src/x/">x/</a>                          # X/Twitter bot
+│
+├── <a href="webapp/">webapp/</a>                             # React + Vite frontend
+│       ├── <a href="webapp/src/pages/">pages/</a>
+│       │   ├── <a href="webapp/src/pages/EventMarketPage.tsx">EventMarketPage.tsx</a>     # EventBet market view
+│       │   ├── <a href="webapp/src/pages/EventMarketCreatePage.tsx">EventMarketCreatePage.tsx</a>
+│       ├── <a href="webapp/src/components/">components/</a>
+│       │   ├── <a href="webapp/src/components/ConnectWallet.tsx">ConnectWallet.tsx</a>       # SIWE sign-in + wallet connect
+│       │   ├── <a href="webapp/src/components/ChainSelector.tsx">ChainSelector.tsx</a>
+│
+└── <a href="images/">images/</a>                             # Architecture diagrams (source of truth for this README)
+    ├── <a href="images/constellar_oracle_swarm_gateway_architecture.svg">constellar_oracle_swarm_gateway_architecture.svg</a>
+    └── <a href="images/constellar_event_settlement_gateway_flow.svg">constellar_event_settlement_gateway_flow.svg</a>
+</pre>
 
 ## Key Technologies
 
-- **Payments:** x402 (HTTP 402 + EIP-3009), Circle Gateway (TEE-based batch settlement), USDC
+- **NanoPayments:** x402 (HTTP 402 + EIP-3009), Circle Gateway (TEE-based batch settlement), USDC
 - **Chains:** Arc Testnet (native settlement + reputation), Base / other EVM (markets + bootstrap liquidity)
 - **Backend:** Node.js, Express, Prisma/Postgres, PM2, viem
 - **Frontend:** React, Vite, wagmi, SIWE
 - **Oracles:** Gemini reasoning over X API v2, Google CSE, GDELT 2.0, Reddit, YouTube
 - **Contracts:** Foundry — `EventBet`, `EventBetFactory`, `Bet`, `BetFactory`, `PriceOracleFactory`, `OracleRegistry`
+
+---
+
+## Why Arc + Circle Nanopayments
+
+- **High-frequency judgment requests.** Each market resolution fans out to 5 oracles × 3 stages (evidence / summarize / verdict) — dozens of micro-calls per event. Per-call on-chain transactions would be prohibitively expensive and slow; x402 HTTP 402 + EIP-3009 keeps payment at the network layer with no immediate chain tx.
+- **AI agents as oracle nodes for small paid tasks.** Oracle nodes are autonomous agents that earn USDC for each verified evidence or verdict they return. Circle Gateway lets them receive streamed micropayments without ever holding chain transaction keys — the Gateway TEE accounts and batches settlement on their behalf.
+- **Outcomes settle in USDC on Arc — onchain, auditable, and verifiable.** The final `EventBet.resolve()` call and `OracleRegistry.applyOutcome()` reputation update are both written to Arc Testnet, creating a permanent, auditable record of every verdict and its on-chain consequences.
+
+## Why Gemini
+
+- **Increase factual accuracy.** Gemini cross-references each oracle's raw evidence against its own knowledge before producing a summary or verdict, reducing the impact of low-quality or stale source material.
+- **Reduce hallucinations with Google Search grounding.** Gemini's native Google Search grounding mode anchors responses to live web results rather than relying solely on parametric memory, significantly lowering the rate of invented facts.
+- **Access real-time web evidence.** Grounded queries retrieve pages published minutes before resolution, ensuring verdicts reflect the most current state of a real-world event rather than training-data snapshots.
+- **Return citations for verification.** Every Gemini response includes source URLs that are stored alongside the verdict, allowing anyone to inspect the evidence chain that produced a market outcome.

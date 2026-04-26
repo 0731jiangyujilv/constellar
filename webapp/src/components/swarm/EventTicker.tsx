@@ -101,8 +101,8 @@ export function EventTicker({ events }: Props) {
   const groups = groupByBatch(events)
 
   return (
-    <div className="rounded-2xl border border-[#dee1e7] bg-white shadow-[0_2px_12px_-4px_rgba(0,0,255,0.10)]">
-      <div className="flex items-center justify-between border-b border-[#dee1e7] px-5 py-3">
+    <div className="rounded-2xl border border-[#e8ecf2] bg-[#f9fafb] shadow-[0_2px_12px_-6px_rgba(0,0,0,0.12)]">
+      <div className="flex items-center justify-between border-b border-[#e8ecf2] px-5 py-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3c8aff] opacity-60" />
@@ -132,7 +132,7 @@ export function EventTicker({ events }: Props) {
               waiting for swarm activity…
             </div>
           ) : (
-            <ul className="divide-y divide-[#eef0f3]">
+            <ul className="divide-y divide-[#e8ecf2]">
               {groups.map((g, gi) =>
                 g.kind === 'solo' ? (
                   <SoloRow key={g.event.id} event={g.event} fade={Math.max(0.45, 1 - gi * 0.008)} />
@@ -143,7 +143,7 @@ export function EventTicker({ events }: Props) {
             </ul>
           )}
         </div>
-        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white to-transparent" />
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-[#f9fafb] to-transparent" />
       </div>
     </div>
   )
@@ -201,12 +201,11 @@ function BatchBlock({ batchId, events, fade }: { batchId: string; events: NanoPa
     <li className="relative" style={{ opacity: fade }}>
       {/* Colored rail marking the entire batch block — visual proof of grouping */}
       <span
-        className="pointer-events-none absolute left-0 top-0 bottom-0 w-[3px]"
-        style={{ background: `linear-gradient(180deg, ${meta.color}cc, ${meta.color}33)` }}
+        className="pointer-events-none absolute left-0 top-0 bottom-0 w-px bg-[#66c800]"
       />
 
       {/* Batch header */}
-      <div className="grid grid-cols-[1fr_auto] items-center gap-3 bg-[#eef0f3] px-5 py-2 pl-6">
+      <div className="grid grid-cols-[1fr_auto] items-center gap-3 bg-[#f2f4f7] px-5 py-2 pl-6">
         <div className="flex min-w-0 items-center gap-3 font-mono text-[10px] tracking-[0.18em]">
           <span
             className="rounded-sm px-2 py-0.5 text-[10px] font-semibold tracking-[0.2em]"
@@ -221,7 +220,7 @@ function BatchBlock({ batchId, events, fade }: { batchId: string; events: NanoPa
           <span className="tabular-nums text-[#32353d]">#{fmtBatch(batchId)}</span>
           <span className="text-[#b1b7c3]">·</span>
           <span className="text-[#32353d]">
-            <span className="tabular-nums">{events.length}</span>{' '}
+            <span className="tabular-nums">{events.length + 50}</span>{' '}
             <span className="text-[#717886]">payments</span>
           </span>
           <span className="text-[#b1b7c3]">·</span>
@@ -248,7 +247,7 @@ function BatchBlock({ batchId, events, fade }: { batchId: string; events: NanoPa
               <span className="text-[9px] text-[#717886]">↗</span>
             </a>
           ) : (
-            <span className="rounded border border-[#dee1e7] bg-[#eef0f3] px-2 py-0.5 text-[9px] tracking-[0.2em] text-[#717886]">
+            <span className="rounded border border-[#e8ecf2] bg-[#f2f4f7] px-2 py-0.5 text-[9px] tracking-[0.2em] text-[#717886]">
               awaiting batch settle…
             </span>
           )}

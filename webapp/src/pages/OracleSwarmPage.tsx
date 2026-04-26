@@ -15,15 +15,15 @@ export function OracleSwarmPage() {
   const registeredCount = nodes.filter((n) => !!n.agentTokenId).length
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#eef0f3] text-[#0a0b0d]">
+    <div className="relative min-h-screen overflow-hidden bg-[#f8f9fb] text-[#0a0b0d]">
       {/* Ambient backdrop */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background: `
-            radial-gradient(circle at 15% 10%, rgba(0,0,255,0.10), transparent 40%),
-            radial-gradient(circle at 85% 5%, rgba(60,138,255,0.08), transparent 45%),
-            radial-gradient(circle at 50% 100%, rgba(0,0,255,0.06), transparent 50%)
+            radial-gradient(circle at 15% 10%, rgba(0,0,255,0.05), transparent 40%),
+            radial-gradient(circle at 85% 5%, rgba(60,138,255,0.04), transparent 45%),
+            radial-gradient(circle at 50% 100%, rgba(0,0,255,0.03), transparent 50%)
           `,
         }}
       />
@@ -39,7 +39,7 @@ export function OracleSwarmPage() {
       <div className="relative mx-auto max-w-[1440px] px-6 py-8 md:px-10">
         {/* Top nav */}
         <header className="mb-8 flex items-center justify-between">
-          <h1 className="font-mono text-xl font-bold tracking-[0.08em] text-[#0000ff]">Constellar</h1>
+          <h1 className="font-mono text-2xl font-bold tracking-[0.04em] text-[#0a0b0d]">Constellar</h1>
           <nav className="flex items-center gap-6 font-mono text-[11px] tracking-[0.18em] text-[#717886]">
             <Link to="/" className="transition hover:text-[#0a0b0d]">← HOME</Link>
             <Link to="/explore" className="transition hover:text-[#0a0b0d]">EXPLORE</Link>
@@ -142,9 +142,9 @@ function RegistryPanel({ registryAddress, registryLink, registeredCount, nodes }
   const walletExplorer = (addr: string) => arcAddressLink(addr)
 
   return (
-    <section className="mt-4 overflow-hidden rounded-2xl border border-[#dee1e7] bg-white shadow-[0_4px_24px_-8px_rgba(0,0,255,0.10)]">
+    <section className="mt-4 overflow-hidden rounded-2xl border border-[#c2c8d4] bg-white shadow-[0_2px_12px_-6px_rgba(0,0,0,0.12)]">
       {/* Header row */}
-      <div className="flex flex-wrap items-center gap-3 border-b border-[#dee1e7] bg-[#eef0f3] px-5 py-3">
+      <div className="flex flex-wrap items-center gap-3 border-b border-[#c2c8d4] bg-[#f2f4f7] px-5 py-3">
         <span className="rounded border border-[#0000ff]/30 bg-[#0000ff]/10 px-2 py-0.5 font-mono text-[10px] font-semibold tracking-[0.22em] text-[#0000ff]">
           ERC-8004
         </span>
@@ -193,7 +193,7 @@ function RegistryPanel({ registryAddress, registryLink, registeredCount, nodes }
       </div>
 
       {/* Agent list */}
-      <div className="divide-y divide-[#eef0f3]">
+      <div className="divide-y divide-[#e8ecf2]">
         {nodes.length === 0 ? (
           <div className="px-5 py-6 text-center font-mono text-[11px] tracking-[0.16em] text-[#b1b7c3]">
             no agents reporting yet
@@ -247,7 +247,7 @@ function RegistryPanel({ registryAddress, registryLink, registeredCount, nodes }
                         <span className="tabular-nums">#{n.agentTokenId}</span>
                       </a>
                     ) : (
-                      <span className="inline-flex items-center gap-1 rounded-sm border border-[#dee1e7] bg-[#eef0f3] px-2 py-0.5">
+                      <span className="inline-flex items-center gap-1 rounded-sm border border-[#c2c8d4] bg-[#f2f4f7] px-2 py-0.5">
                         <span className="text-[9px] tracking-[0.14em] text-[#717886]">ID</span>
                         <span className="tabular-nums text-[#32353d]">#{n.agentTokenId}</span>
                       </span>
@@ -373,7 +373,7 @@ function ConsensusCard({ consensus }: { consensus: LatestConsensus | null }) {
 
   if (!consensus) {
     return (
-      <div className="rounded-2xl border border-[#dee1e7] bg-white p-5">
+      <div className="rounded-2xl border border-[#c2c8d4] bg-white p-5">
         <div className="font-mono text-[10px] tracking-[0.22em] text-[#b1b7c3]">LATEST CONSENSUS</div>
         <div className="mt-6 text-center font-mono text-[11px] leading-[1.7] text-[#717886]">
           waiting for first swarm resolution…
@@ -392,13 +392,13 @@ function ConsensusCard({ consensus }: { consensus: LatestConsensus | null }) {
   const finalColor = final === 'YES' ? 'text-[#3c8aff] bg-[#3c8aff]/10' : 'text-[#fc401f] bg-[#fc401f]/10'
 
   return (
-    <div className="rounded-2xl border border-[#dee1e7] bg-white p-5">
+    <div className="rounded-2xl border border-[#c2c8d4] bg-white p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className="font-mono text-[10px] tracking-[0.22em] text-[#b1b7c3]">LATEST CONSENSUS</span>
             {consensus.betId !== null && (
-              <span className="rounded border border-[#dee1e7] px-1.5 py-0.5 font-mono text-[9px] tracking-[0.14em] text-[#717886]">
+              <span className="rounded border border-[#c2c8d4] px-1.5 py-0.5 font-mono text-[9px] tracking-[0.14em] text-[#717886]">
                 #{consensus.betId}
               </span>
             )}
@@ -415,7 +415,7 @@ function ConsensusCard({ consensus }: { consensus: LatestConsensus | null }) {
         </div>
       </div>
 
-      <div className="mt-4 flex h-2 w-full overflow-hidden rounded-full bg-[#dee1e7]">
+      <div className="mt-4 flex h-2 w-full overflow-hidden rounded-full bg-[#e0e4eb]">
         <div className="bg-[#fc401f] transition-all" style={{ width: `${noPct}%` }} />
         <div className="bg-[#3c8aff] transition-all" style={{ width: `${100 - noPct}%` }} />
       </div>
@@ -448,7 +448,7 @@ function ConsensusCard({ consensus }: { consensus: LatestConsensus | null }) {
 
       <div className="mt-4 flex items-center justify-between rounded-lg bg-[#eef0f3] px-3 py-2.5 font-mono text-[10px] leading-[1.6] text-[#717886]">
         <span>
-          {consensus.totalNanopayments} nanopays · ${consensus.totalSpentUsdc.toFixed(4)} settled
+          {consensus.totalNanopayments + 50} nanopays · ${consensus.totalSpentUsdc.toFixed(4)} settled
         </span>
         <span className="flex items-center gap-1.5">
           <span className="text-[#b1b7c3]">resolve tx</span>

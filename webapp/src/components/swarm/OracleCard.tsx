@@ -13,20 +13,20 @@ type Props = {
 const STATUS_META: Record<OracleNode['status'], { label: string; dot: string; ring: string; text: string }> = {
   healthy: {
     label: 'LIVE',
-    dot: 'bg-[#3c8aff]',
-    ring: 'ring-[#3c8aff]/30 border-[#3c8aff]/30 shadow-[0_0_16px_-6px_rgba(60,138,255,0.25)]',
-    text: 'text-[#3c8aff]',
+    dot: 'bg-[#66c800]',
+    ring: 'border-[#66c800]/50',
+    text: 'text-[#66c800]',
   },
   degraded: {
     label: 'SLOW',
     dot: 'bg-[#ffd12f]',
-    ring: 'ring-[#ffd12f]/30 border-[#ffd12f]/30 shadow-[0_0_16px_-6px_rgba(255,209,47,0.25)]',
+    ring: 'border-[#ffd12f]/50',
     text: 'text-[#5b616e]',
   },
   offline: {
     label: 'OFFLINE',
     dot: 'bg-[#fc401f]',
-    ring: 'ring-[#fc401f]/30 border-[#fc401f]/30 shadow-[0_0_16px_-6px_rgba(252,64,31,0.25)]',
+    ring: 'border-[#fc401f]/50',
     text: 'text-[#fc401f]',
   },
 }
@@ -44,7 +44,7 @@ function fmtAddr(addr: string): string {
 }
 
 function HeartbeatAgo({ ts }: { ts: number }) {
-  const [now, setNow] = useState(Date.now())
+  const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 250)
     return () => clearInterval(id)
@@ -93,11 +93,11 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
 
   const status = STATUS_META[node.status]
   const offline = node.status === 'offline'
-  const accent = node.status === 'healthy' ? '#3c8aff' : node.status === 'degraded' ? '#ffd12f' : '#fc401f'
+  const accent = node.status === 'healthy' ? '#66c800' : node.status === 'degraded' ? '#ffd12f' : '#fc401f'
 
   return (
     <div
-      className={`relative rounded-2xl border bg-white p-5 ring-1 transition-all ${status.ring} ${
+      className={`relative rounded-2xl border bg-white p-5 transition-all ${status.ring} ${
         offline ? 'animate-[offline-breath_2.4s_ease-in-out_infinite]' : ''
       }`}
     >
@@ -105,7 +105,7 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
       {pulse && !offline && (
         <span
           key={pulseKey}
-          className="pointer-events-none absolute -inset-px rounded-2xl ring-2 ring-[#3c8aff]/60 animate-[card-pulse_1.1s_ease-out]"
+          className="pointer-events-none absolute -inset-px rounded-2xl ring-2 ring-[#66c800]/60 animate-[card-pulse_1.1s_ease-out]"
         />
       )}
 
@@ -113,7 +113,7 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#eef0f3] text-2xl ring-1 ring-[#dee1e7]">
+            <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#f2f4f7] text-2xl ring-1 ring-[#c2c8d4]">
               <span style={{ filter: offline ? 'grayscale(1) opacity(0.4)' : 'none' }}>{node.emoji}</span>
             </div>
             <div className="min-w-0">
@@ -211,7 +211,7 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
           </div>
         )}
 
-        <div className="mt-5 h-px w-full bg-gradient-to-r from-transparent via-[#dee1e7] to-transparent" />
+        <div className="mt-5 h-px w-full bg-gradient-to-r from-transparent via-[#c2c8d4] to-transparent" />
 
         {/* Latency sparkline */}
         <div className="mt-4">
@@ -259,12 +259,12 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
           <AccuracyBar value={node.accuracy} offline={offline} />
         </div>
 
-        <div className="mt-5 h-px w-full bg-[#eef0f3]" />
+        <div className="mt-5 h-px w-full bg-[#e8ecf2]" />
 
         {/* Footer */}
         <div className="mt-3 flex items-center justify-between font-mono text-[10px]">
           <div className="flex items-center gap-1.5 text-[#b1b7c3]">
-            <span className={`inline-block h-1 w-1 rounded-full ${offline ? 'bg-[#b1b7c3]' : 'bg-[#3c8aff]'}`} />
+            <span className={`inline-block h-1 w-1 rounded-full ${offline ? 'bg-[#b1b7c3]' : 'bg-[#66c800]'}`} />
             <span>uptime</span>
             <span className={`tabular-nums ${offline ? 'text-[#b1b7c3]' : 'text-[#32353d]'}`}>
               {fmtUptime(node.uptimeSec)}
@@ -285,7 +285,7 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
 
         <div className="mt-2 flex items-center justify-between font-mono text-[10px] text-[#b1b7c3]">
           <div className="flex items-center gap-1.5">
-            <span className="inline-block h-1 w-1 rounded-full bg-[#0000ff] animate-pulse" />
+            <span className="inline-block h-1 w-1 rounded-full bg-[#66c800] animate-pulse" />
             <span>heartbeat</span>
             <HeartbeatAgo ts={node.lastHeartbeatAt} />
             <span>ago</span>
@@ -299,8 +299,8 @@ export function OracleCard({ node, pulse, killed, onToggleKill }: Props) {
             title={`copy: pm2 ${killed ? 'restart' : 'stop'} ${node.id}`}
             className={`group cursor-pointer rounded px-2 py-0.5 font-mono text-[9px] tracking-[0.15em] transition ${
               killed
-                ? 'bg-[#3c8aff]/15 text-[#3c8aff] hover:bg-[#3c8aff]/25'
-                : 'bg-[#eef0f3] text-[#717886] hover:bg-[#dee1e7] hover:text-[#32353d]'
+                ? 'bg-[#66c800]/15 text-[#66c800] hover:bg-[#66c800]/25'
+                : 'bg-[#f2f4f7] text-[#717886] hover:bg-[#e8ecf2] hover:text-[#32353d]'
             }`}
           >
             {killed ? '◉ COPY pm2 restart' : '◌ COPY pm2 stop'}
